@@ -15,3 +15,4 @@ use App\Http\Controllers\HelloWorldController;
 */
 
 Route::get('/', [HelloWorldController::class, "homepage"]);
+
