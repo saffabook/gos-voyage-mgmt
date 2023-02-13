@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+// use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -14,10 +15,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
-Route::middleware('auth:sanctum')->get('/posts', function (Request $request) {
-    return $request->posts();
-});
+// Declare a URL and link the file to the URL
+// Route::post('/posts/{id}', 'GetPost');
+
+// Route::post('posts', [GetPost::class]);
+
+Route::post('user/{id}', 'ProfileController');
