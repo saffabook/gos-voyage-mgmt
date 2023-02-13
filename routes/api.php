@@ -1,9 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
-// use Illuminate\Support\Facades\Route;
-
-
+use App\Http\Controllers;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -15,10 +12,5 @@ use Illuminate\Http\Request;
 |
 */
 
-
-// Declare a URL and link the file to the URL
-// Route::post('/posts/{id}', 'GetPost');
-
-// Route::post('posts', [GetPost::class]);
-
-Route::post('user/{id}', 'ProfileController');
+Route::post('posts', Controllers\GetPost::class);
+    
