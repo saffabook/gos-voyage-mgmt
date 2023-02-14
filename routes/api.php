@@ -13,4 +13,5 @@ use App\Http\Controllers;
 */
 
 Route::post('posts', Controllers\GetPost::class);
-    
+
+Route::get('posts/{id}', Controllers\GetPost::class);

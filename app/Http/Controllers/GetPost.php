@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Post;
 
 class GetPost extends Controller
 {
@@ -14,7 +15,8 @@ class GetPost extends Controller
      */
     public function __invoke()
     {
-        //
-        var_dump('hello world');
+        $postsFromDb = Post::get();
+
+        var_dump($postsFromDb->toarray());
     }
 }
