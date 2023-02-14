@@ -13,10 +13,14 @@ class GetPost extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke()
+    public function __invoke($id)
     {
-        $postsFromDb = Post::get();
+        $post = Post::where('id', $id)->first();
 
-        var_dump($postsFromDb->toarray());
+        if (!$post) {
+            return 'Post does not exist';
+        }
+
+        return response()->json($post);
     }
 }
