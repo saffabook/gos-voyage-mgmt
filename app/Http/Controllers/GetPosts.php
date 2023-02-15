@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Post;
 
-class GetPost extends Controller
+class GetPosts extends Controller
 {
     /**
      * Handle the incoming request.
@@ -13,14 +13,14 @@ class GetPost extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke($id)
+    public function __invoke()
     {
-        $post = Post::where('id', $id)->first();
+        $postsFromDb = Post::get();
 
-        if (!$post) {
-            return 'Post does not exist';
+        if (!$postsFromDb) {
+          return 'There are no posts';
         }
 
-        return response()->json($post);
+        return response()->json($postsFromDb);
     }
 }
