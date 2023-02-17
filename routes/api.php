@@ -21,3 +21,5 @@ Route::get('posts/{id}', Controllers\GetPost::class);
 Route::delete('posts/post-delete/{id}', Controllers\DeletePost::class);
 
 Route::post('post-add', Controllers\AddPost::class);
+
+Route::put('posts/post-update/{id}', Controllers\UpdatePost::class);
