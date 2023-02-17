@@ -22,4 +22,4 @@ Route::delete('posts/post-delete/{id}', Controllers\DeletePost::class);
 
 Route::post('post-add', Controllers\AddPost::class);
 
-Route::put('posts/post-update/{id}', Controllers\UpdatePost::class);
+Route::post('posts/post-update/{id}', Controllers\UpdatePost::class);
