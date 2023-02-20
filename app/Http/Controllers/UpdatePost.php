@@ -21,6 +21,10 @@ class UpdatePost extends Controller
           return 'Post not found';
         }
 
+        $request->validate([
+            'title' => 'required|string|max:15'
+        ]);
+
         $post->update([
           'title' => $request->input('title')
         ]);

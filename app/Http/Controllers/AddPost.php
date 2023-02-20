@@ -15,10 +15,14 @@ class AddPost extends Controller
      */
     public function __invoke(Request $request)
     {
-        $post = Post::create([
-          'title' => $request->input('title')
+        $request->validate([
+            'title' => 'required|string|max:15'
         ]);
 
-        return response()->json($post['title']);
+        $post = Post::create([
+            'title' => $request->input('title')
+        ]);
+
+        return response()->json($post);
     }
 }
