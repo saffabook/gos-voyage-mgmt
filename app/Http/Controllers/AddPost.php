@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Post;
+use Illuminate\Support\Facades\Validator;
 
 class AddPost extends Controller
 {
@@ -15,14 +16,19 @@ class AddPost extends Controller
      */
     public function __invoke(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:15'
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:15',
         ]);
 
-        $post = Post::create([
+        if ($validator->fails()) {
+            $validatorErrorMessage = $validator->messages();
+            return response()->json(['error' => $validatorErrorMessage->toArray()], 404);
+        }
+
+        Post::create([
             'title' => $request->input('title')
         ]);
 
-        return response()->json($post);
+        return response()->json(['data' => 'The post was added'], 200);
     }
 }
