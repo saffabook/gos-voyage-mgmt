@@ -24,3 +24,7 @@ Route::post('posts/post-update/{id}', Controllers\UpdatePost::class);
 
 // Routes to Crud comments
 Route::post('comment-add', Controllers\AddPostComment::class);
+Route::delete('comments/comment-delete/{id}', Controllers\DeletePostComment::class);
+Route::get('comments', Controllers\GetPostComments::class);
+Route::get('comments/{id}', Controllers\GetPostComment::class);
+Route::post('comments/comment-update/{id}', Controllers\UpdatePostComment::class);
