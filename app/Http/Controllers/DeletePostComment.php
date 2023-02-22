@@ -18,11 +18,11 @@ class DeletePostComment extends Controller
         $comment = PostComment::where('id', $id)->first();
         
         if (!$comment) {
-          return 'Post not found';
+          return 'Comment not found';
         } 
 
         $comment->delete();
 
-        return 'Post deleted successfully';
+        return response()->json(['data' => 'Comment deleted successfully'], 200);
     }
 }

@@ -18,7 +18,7 @@ class GetPostComment extends Controller
         $comment = PostComment::where('id', $id)->first();
 
         if (!$comment) {
-            return 'Comment does not exist';
+            return 'Comment not found';
         }
 
         return response()->json($comment);

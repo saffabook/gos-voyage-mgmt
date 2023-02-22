@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PostComment;
+use Illuminate\Support\Facades\Validator;
 
 class AddPostComment extends Controller
 {
@@ -15,10 +16,19 @@ class AddPostComment extends Controller
      */
     public function __invoke(Request $request)
     {
-        $postComment = PostComment::create([
-          'comment' => $request->input('comment')
+        $validator = Validator::make($request->all(), [
+            'comment' => 'required|string|max:255',
         ]);
 
-        return response()->json($postComment['comment']);
+        if ($validator->fails()) {
+            $validatorErrorMessage = $validator->messages();
+            return response()->json(['error' => $validatorErrorMessage->toArray()], 404);
+        }
+
+        PostComment::create([
+            'comment' => $request->input('comment')
+        ]);
+
+        return response()->json(['data' => 'The comment was added'], 200);
     }
 }
