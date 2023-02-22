@@ -14,14 +14,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Routes to Crud posts
 Route::post('posts', Controllers\GetPost::class);
-
 Route::get('posts', Controllers\GetPosts::class);
-
 Route::get('posts/{id}', Controllers\GetPost::class);
-
 Route::delete('posts/post-delete/{id}', Controllers\DeletePost::class);
-
 Route::post('post-add', Controllers\AddPost::class);
-
 Route::post('posts/post-update/{id}', Controllers\UpdatePost::class);
+
+// Routes to Crud comments
+Route::post('comment-add', Controllers\AddPostComment::class);
