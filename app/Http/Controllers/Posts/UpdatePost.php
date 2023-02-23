@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Posts;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Post;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Post;
 
-class AddPost extends Controller
+class UpdatePost extends Controller
 {
     /**
      * Handle the incoming request.
@@ -14,7 +15,7 @@ class AddPost extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:15',
@@ -25,10 +26,16 @@ class AddPost extends Controller
             return response()->json(['error' => $validatorErrorMessage->toArray()], 404);
         }
 
-        Post::create([
-            'title' => $request->input('title')
+        $post = Post::where('id', $id)->first();
+
+        if (!$post) {
+          return 'Post not found';
+        }
+
+        $post->update([
+          'title' => $request->input('title')
         ]);
 
-        return response()->json(['data' => 'The post was added'], 200);
+        return response()->json(['data' => 'Post updated successfully'], 200);
     }
 }

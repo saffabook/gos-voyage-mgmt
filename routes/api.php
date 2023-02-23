@@ -14,17 +14,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Routes to Crud posts
-Route::post('posts', Controllers\GetPost::class);
-Route::get('posts', Controllers\GetPosts::class);
-Route::get('posts/{id}', Controllers\GetPost::class);
-Route::delete('posts/post-delete/{id}', Controllers\DeletePost::class);
-Route::post('post-add', Controllers\AddPost::class);
-Route::post('posts/post-update/{id}', Controllers\UpdatePost::class);
+Route::group([
+    'prefix' => 'posts'
+    ], function () {
+    Route::post('add', Controllers\Posts\AddPost::class);
+    Route::get('/', Controllers\Posts\GetPosts::class);
+    Route::get('posts', Controllers\Posts\GetPosts::class);
+    Route::get('post/{id}', Controllers\Posts\GetPost::class);
+    Route::post('update/{id}', Controllers\Posts\UpdatePost::class);
+    Route::delete('delete/{id}', Controllers\Posts\DeletePost::class);
+});
 
-// Routes to Crud comments
-Route::post('comment-add', Controllers\AddPostComment::class);
-Route::post('comments/comment-delete/{id}', Controllers\DeletePostComment::class);
-Route::get('comments', Controllers\GetPostComments::class);
-Route::get('comments/{id}', Controllers\GetPostComment::class);
-Route::post('comments/comment-update/{id}', Controllers\UpdatePostComment::class);
+Route::group([
+    'prefix' => 'comments'
+    ], function () {
+    Route::post('add', Controllers\Comments\AddPostComment::class);
+    Route::get('/', Controllers\Comments\GetPostComments::class);
+    Route::get('comments', Controllers\Comments\GetPostComments::class);
+    Route::get('comment/{id}', Controllers\Comments\GetPostComment::class);
+    Route::post('update/{id}', Controllers\Comments\UpdatePostComment::class);
+    Route::post('delete/{id}', Controllers\Comments\DeletePostComment::class);
+});
