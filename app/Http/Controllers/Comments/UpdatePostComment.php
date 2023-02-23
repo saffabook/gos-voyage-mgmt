@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Comments;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\PostComment;
 use Illuminate\Support\Facades\Validator;

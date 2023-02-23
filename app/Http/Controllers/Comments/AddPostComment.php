@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Comments;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Post;
 use Illuminate\Support\Facades\Validator;
+use App\Models\PostComment;
 
-class UpdatePost extends Controller
+class AddPostComment extends Controller
 {
     /**
      * Handle the incoming request.
@@ -14,10 +15,10 @@ class UpdatePost extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke(Request $request, $id)
+    public function __invoke(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:15',
+            'comment' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -25,16 +26,10 @@ class UpdatePost extends Controller
             return response()->json(['error' => $validatorErrorMessage->toArray()], 404);
         }
 
-        $post = Post::where('id', $id)->first();
-
-        if (!$post) {
-          return 'Post not found';
-        }
-
-        $post->update([
-          'title' => $request->input('title')
+        PostComment::create([
+            'comment' => $request->input('comment')
         ]);
 
-        return response()->json(['data' => 'Post updated successfully'], 200);
+        return response()->json(['data' => 'The comment was added'], 200);
     }
 }
