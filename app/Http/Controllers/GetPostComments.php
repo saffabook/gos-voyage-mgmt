@@ -18,7 +18,7 @@ class GetPostComments extends Controller
         $commentsFromDb = PostComment::all();
 
         if ($commentsFromDb->isEmpty()) {
-          return 'There are no comments';
+          return response()->json(['error' => 'No comments found'], 404);
         }
 
         return response()->json($commentsFromDb);
