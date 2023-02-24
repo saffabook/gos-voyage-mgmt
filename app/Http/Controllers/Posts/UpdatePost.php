@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Post;
+use App\Helpers\ApiResponse;
 
 class UpdatePost extends Controller
 {
@@ -23,19 +24,19 @@ class UpdatePost extends Controller
 
         if ($validator->fails()) {
             $validatorErrorMessage = $validator->messages();
-            return response()->json(['error' => $validatorErrorMessage->toArray()], 404);
+            return ApiResponse::error($validatorErrorMessage);
         }
 
         $post = Post::where('id', $id)->first();
 
         if (!$post) {
-          return 'Post not found';
+          return ApiResponse::error('Post not found');
         }
 
         $post->update([
           'title' => $request->input('title')
         ]);
 
-        return response()->json(['data' => 'Post updated successfully'], 200);
+        return ApiResponse::success($post, 'Post updated successfully');
     }
 }

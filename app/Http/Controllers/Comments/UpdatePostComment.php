@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\PostComment;
 use Illuminate\Support\Facades\Validator;
+use App\Helpers\ApiResponse;
 
 class UpdatePostComment extends Controller
 {
@@ -23,19 +24,19 @@ class UpdatePostComment extends Controller
 
         if ($validator->fails()) {
             $validatorErrorMessage = $validator->messages();
-            return response()->json(['error' => $validatorErrorMessage->toArray()], 404);
+            return ApiResponse::error($validatorErrorMessage);
         }
 
         $comment = PostComment::where('id', $id)->first();
 
         if (!$comment) {
-          return response()->json(['error' => 'Comment not found'], 404);
+          return ApiResponse::error('Comment not found');
         }
 
         $comment->update([
           'comment' => $request->input('comment')
         ]);
 
-        return response()->json(['data' => 'Comment updated successfully'], 200);
+        return ApiResponse::success($comment, 'Comment updated successfully');
     }
 }

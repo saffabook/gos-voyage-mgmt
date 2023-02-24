@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Comments;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\PostComment;
+use App\Helpers\ApiResponse;
 
 class GetPostComments extends Controller
 {
@@ -19,9 +20,9 @@ class GetPostComments extends Controller
         $commentsFromDb = PostComment::all();
 
         if ($commentsFromDb->isEmpty()) {
-          return response()->json(['error' => 'No comments found'], 404);
+          return ApiResponse::error('No comments found');
         }
 
-        return response()->json($commentsFromDb);
+        return ApiResponse::success($commentsFromDb);
     }
 }
