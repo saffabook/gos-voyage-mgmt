@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Posts;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Post;
+use App\Helpers\ApiResponse;
 
 class DeletePost extends Controller
 {
@@ -19,11 +20,11 @@ class DeletePost extends Controller
         $post = Post::where('id', $id)->first();
         
         if (!$post) {
-          return 'Post not found';
+          return ApiResponse::error('Post not found');
         } 
 
         $post->delete();
 
-        return 'Post deleted successfully';
+        return ApiResponse::success('Post deleted successfully');
     }
 }

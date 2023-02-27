@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Post;
+use App\Helpers\ApiResponse;
 
 class AddPost extends Controller
 {
@@ -22,14 +23,13 @@ class AddPost extends Controller
         ]);
 
         if ($validator->fails()) {
-            $validatorErrorMessage = $validator->messages();
-            return response()->json(['error' => $validatorErrorMessage->toArray()], 404);
+            return ApiResponse::error($validator->messages());
         }
 
-        Post::create([
+        $title = Post::create([
             'title' => $request->input('title')
         ]);
 
-        return response()->json(['data' => 'The post was added'], 200);
+        return ApiResponse::success($title, 'The post was added');
     }
 }

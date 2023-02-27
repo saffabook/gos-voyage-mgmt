@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Posts;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Post;
+use App\Helpers\ApiResponse;
 
 class GetPosts extends Controller
 {
@@ -18,10 +19,10 @@ class GetPosts extends Controller
     {
         $postsFromDb = Post::get();
 
-        if (!$postsFromDb) {
-          return 'There are no posts';
+        if ($postsFromDb->isEmpty()) {
+          return ApiResponse::error('No posts found');
         }
 
-        return response()->json($postsFromDb);
+        return ApiResponse::success($postsFromDb);
     }
 }

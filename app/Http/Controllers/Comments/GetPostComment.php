@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Comments;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\PostComment;
+use App\Helpers\ApiResponse;
 
 class GetPostComment extends Controller
 {
@@ -19,9 +20,9 @@ class GetPostComment extends Controller
         $comment = PostComment::where('id', $id)->first();
 
         if (!$comment) {
-            return response()->json(['error' => 'Comment not found'], 404);
+            return ApiResponse::error('Comment not found');
         }
 
-        return response()->json($comment);
+        return ApiResponse::success($comment);
     }
 }

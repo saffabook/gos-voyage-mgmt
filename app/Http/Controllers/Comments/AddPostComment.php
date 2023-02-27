@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\PostComment;
+use App\Helpers\ApiResponse;
 
 class AddPostComment extends Controller
 {
@@ -22,14 +23,13 @@ class AddPostComment extends Controller
         ]);
 
         if ($validator->fails()) {
-            $validatorErrorMessage = $validator->messages();
-            return response()->json(['error' => $validatorErrorMessage->toArray()], 404);
+            return ApiResponse::error($validator->messages());
         }
 
-        PostComment::create([
+        $comment = PostComment::create([
             'comment' => $request->input('comment')
         ]);
 
-        return response()->json(['data' => 'The comment was added'], 200);
+        return ApiResponse::success($comment, 'The comment was added');
     }
 }

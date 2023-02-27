@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Posts;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Post;
+use App\Helpers\ApiResponse;
 
 class GetPost extends Controller
 {
@@ -22,6 +23,6 @@ class GetPost extends Controller
             return 'Post does not exist';
         }
 
-        return response()->json($post);
+        return ApiResponse::success($post);
     }
 }

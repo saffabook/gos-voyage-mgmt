@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Comments;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\PostComment;
+use App\Helpers\ApiResponse;
 
 class DeletePostComment extends Controller
 {
@@ -19,11 +20,11 @@ class DeletePostComment extends Controller
         $comment = PostComment::where('id', $id)->first();
         
         if (!$comment) {
-          return response()->json(['error' => 'Comment not found'], 404);
-        } 
+          return ApiResponse::error('Comment not found');
+        }
 
         $comment->delete();
 
-        return response()->json(['data' => 'Comment deleted successfully'], 200);
+        return ApiResponse::success($comment, 'Comment deleted successfully');
     }
 }
