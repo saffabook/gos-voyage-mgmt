@@ -23,8 +23,7 @@ class AddPostComment extends Controller
         ]);
 
         if ($validator->fails()) {
-            $validatorErrorMessage = $validator->messages();
-            return ApiResponse::error($validatorErrorMessage);
+            return ApiResponse::error($validator->messages());
         }
 
         $comment = PostComment::create([

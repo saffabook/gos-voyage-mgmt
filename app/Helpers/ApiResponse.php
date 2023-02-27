@@ -7,10 +7,10 @@ class ApiResponse
     public static function success($data, $message = false)
     {
         if (is_string($data)) {
-            $returnData['message'] = $data;
+            $data['message'] = $data;
         }
 
-        if ($message) {
+        if (is_array($data) && $message) {
             $data['message'] = $message;
         }
 

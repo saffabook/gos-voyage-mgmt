@@ -23,8 +23,7 @@ class UpdatePost extends Controller
         ]);
 
         if ($validator->fails()) {
-            $validatorErrorMessage = $validator->messages();
-            return ApiResponse::error($validatorErrorMessage);
+            return ApiResponse::error($validator->messages());
         }
 
         $post = Post::where('id', $id)->first();
