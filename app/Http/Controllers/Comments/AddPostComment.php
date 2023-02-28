@@ -18,17 +18,16 @@ class AddPostComment extends Controller
      */
     public function __invoke(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validatedData = Validator::make($request->all(), [
             'comment' => 'required|string|max:255',
+            'post_id' => 'required|exists:posts,id'
         ]);
 
-        if ($validator->fails()) {
-            return ApiResponse::error($validator->messages());
+        if ($validatedData->fails()) {
+            return ApiResponse::error($validatedData->messages());
         }
 
-        $comment = PostComment::create([
-            'comment' => $request->input('comment')
-        ]);
+        $comment = PostComment::create($validatedData->validated());
 
         return ApiResponse::success($comment, 'The comment was added');
     }

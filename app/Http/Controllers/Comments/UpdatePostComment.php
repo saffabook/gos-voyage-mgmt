@@ -18,23 +18,21 @@ class UpdatePostComment extends Controller
      */
     public function __invoke(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
+        $validatedData = Validator::make($request->all(), [
             'comment' => 'required|string|max:255',
         ]);
 
-        if ($validator->fails()) {
-            return ApiResponse::error($validator->messages());
+        if ($validatedData->fails()) {
+            return ApiResponse::error($validatedData->messages());
         }
 
         $comment = PostComment::where('id', $id)->first();
 
         if (!$comment) {
-          return ApiResponse::error('Comment not found');
+            return ApiResponse::error('Comment not found');
         }
 
-        $comment->update([
-          'comment' => $request->input('comment')
-        ]);
+        $comment->update($validatedData->validated());
 
         return ApiResponse::success($comment, 'Comment updated successfully');
     }
