@@ -18,12 +18,12 @@ class UpdatePostComment extends Controller
      */
     public function __invoke(Request $request, $id)
     {
-        $validatorData = Validator::make($request->all(), [
+        $validatedData = Validator::make($request->all(), [
             'comment' => 'required|string|max:255',
         ]);
 
-        if ($validatorData->fails()) {
-            return ApiResponse::error($validatorData->messages());
+        if ($validatedData->fails()) {
+            return ApiResponse::error($validatedData->messages());
         }
 
         $comment = PostComment::where('id', $id)->first();
@@ -32,7 +32,7 @@ class UpdatePostComment extends Controller
             return ApiResponse::error('Comment not found');
         }
 
-        $comment->update($validatorData->validated());
+        $comment->update($validatedData->validated());
 
         return ApiResponse::success($comment, 'Comment updated successfully');
     }

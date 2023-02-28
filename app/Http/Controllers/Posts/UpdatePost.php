@@ -18,12 +18,12 @@ class UpdatePost extends Controller
      */
     public function __invoke(Request $request, $id)
     {
-        $validatorData = Validator::make($request->all(), [
+        $validatedData = Validator::make($request->all(), [
             'title' => 'required|string|max:15',
         ]);
 
-        if ($validatorData->fails()) {
-            return ApiResponse::error($validatorData->messages());
+        if ($validatedData->fails()) {
+            return ApiResponse::error($validatedData->messages());
         }
 
         $post = Post::where('id', $id)->first();
@@ -32,7 +32,7 @@ class UpdatePost extends Controller
           return ApiResponse::error('Post not found');
         }
 
-        $post->update($validatorData->validated());
+        $post->update($validatedData->validated());
 
         return ApiResponse::success($post, 'Post updated successfully');
     }

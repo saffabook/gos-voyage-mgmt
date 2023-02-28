@@ -18,15 +18,15 @@ class AddPost extends Controller
      */
     public function __invoke(Request $request)
     {
-        $validatorData = Validator::make($request->all(), [
+        $validatedData = Validator::make($request->all(), [
             'title' => 'required|string|max:15',
         ]);
 
-        if ($validatorData->fails()) {
-            return ApiResponse::error($validatorData->messages());
+        if ($validatedData->fails()) {
+            return ApiResponse::error($validatedData->messages());
         }
 
-        $title = Post::create($validatorData->validated());
+        $title = Post::create($validatedData->validated());
 
         return ApiResponse::success($title, 'The post was added');
     }
