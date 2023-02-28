@@ -17,10 +17,10 @@ class GetPost extends Controller
      */
     public function __invoke($id)
     {
-        $post = Post::where('id', $id)->first();
+        $post = Post::with('comments')->find($id);
 
         if (!$post) {
-            return 'Post does not exist';
+            return ApiResponse::error('Post not found');
         }
 
         return ApiResponse::success($post);
