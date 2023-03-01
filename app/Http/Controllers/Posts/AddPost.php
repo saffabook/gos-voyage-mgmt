@@ -20,6 +20,7 @@ class AddPost extends Controller
     {
         $validatedData = Validator::make($request->all(), [
             'title' => 'required|string|max:15',
+            'author' => 'required|string|max:15'
         ]);
 
         if ($validatedData->fails()) {
