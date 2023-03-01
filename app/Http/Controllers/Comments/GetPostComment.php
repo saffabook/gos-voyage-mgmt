@@ -17,7 +17,7 @@ class GetPostComment extends Controller
      */
     public function __invoke($id)
     {
-        $comment = PostComment::where('id', $id)->first();
+        $comment = PostComment::with('post')->find($id);
 
         if (!$comment) {
             return ApiResponse::error('Comment not found');
