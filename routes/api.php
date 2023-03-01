@@ -22,7 +22,7 @@ Route::group([
     Route::get('posts', Controllers\Posts\GetPosts::class);
     Route::get('post/{id}', Controllers\Posts\GetPost::class);
     Route::post('update/{id}', Controllers\Posts\UpdatePost::class);
-    Route::delete('delete/{id}', Controllers\Posts\DeletePost::class);
+    Route::post('delete/{id}', Controllers\Posts\DeletePost::class);
 });
 
 Route::group([
