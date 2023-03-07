@@ -35,3 +35,12 @@ Route::group([
     Route::post('update/{id}', Controllers\Comments\UpdatePostComment::class);
     Route::post('delete/{id}', Controllers\Comments\DeletePostComment::class);
 });
+
+Route::group([
+    'prefix' => 'vessels'
+    ], function () {
+    Route::post('create', Controllers\Vessels\CreateVessel::class);
+    Route::get('/', Controllers\Vessels\ListVessels::class);
+    Route::get('vessel/{id}', Controllers\Vessels\GetVessel::class);
+    Route::post('delete/{id}', Controllers\Vessels\DeleteVessel::class);
+});
