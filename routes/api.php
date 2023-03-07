@@ -42,5 +42,6 @@ Route::group([
     Route::post('create', Controllers\Vessels\CreateVessel::class);
     Route::get('/', Controllers\Vessels\ListVessels::class);
     Route::get('vessel/{id}', Controllers\Vessels\GetVessel::class);
+    Route::post('update', Controllers\Vessels\UpdateVessel::class);
     Route::post('delete/{id}', Controllers\Vessels\DeleteVessel::class);
 });
