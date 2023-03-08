@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCabinsTable extends Migration
+class CreateVesselCabinsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,11 @@ class CreateCabinsTable extends Migration
      */
     public function up()
     {
-        Schema::create('cabins', function (Blueprint $table) {
+        Schema::create('vessel_cabins', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->text('description');
+            $table->integer('max_occupancy');
             $table->boolean('can_be_booked_single')->default(1);
             $table->integer('vessel_id')->nullable();
         });
@@ -29,6 +30,6 @@ class CreateCabinsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cabins');
+        Schema::dropIfExists('vessel_cabins');
     }
 }
