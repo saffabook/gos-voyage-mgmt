@@ -19,7 +19,7 @@ class DeleteVessel extends Controller
     {
         $vessel = Vessel::find($id);
 
-        if (!$vessel) {
+        if (empty($vessel)) {
             return ApiResponse::error('Vessel not found');
         }
 
