@@ -17,7 +17,7 @@ class DeleteVessel extends Controller
      */
     public function __invoke($id)
     {
-        $vessel = Vessel::where('id', $id)->first();
+        $vessel = Vessel::find($id);
 
         if (!$vessel) {
             return ApiResponse::error('Vessel not found');
