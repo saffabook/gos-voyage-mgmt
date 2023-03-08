@@ -20,7 +20,7 @@ class UpdateVessel extends Controller
     {
         $validatedData = Validator::make($request->all(), [
             'id' => 'required|integer|exists:vessels,id',
-            'name' => 'string|max:30|unique:vessels,name,'.$request->id, // Name is unique compared to all but itself
+            'name' => 'string|max:30|unique:vessels,name,'.$request->id,
             'vessel_type' => 'string|max:30',
             'year_built' => 'nullable|date_format:Y-m-d',
             'length_overall' => 'integer',
@@ -34,16 +34,8 @@ class UpdateVessel extends Controller
             return ApiResponse::error($validatedData->messages());
         }
 
-        // TODO: Study the next three lines - write an explanation for review
-
-        // Retrieve model based on id from input in the request
         $vessel = Vessel::find($request->input('id'));
-
-        // Populate model with attributes according to the validated data
         $vessel->fill($validatedData->validated());
-
-        // Update the record in the database
-        // (cf. https://laravel.com/docs/10.x/eloquent#updates)
         $vessel->save();
 
         return ApiResponse::success($vessel, 'The vessel was updated');
