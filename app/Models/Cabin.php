@@ -9,5 +9,5 @@ class VesselCabin extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['description', 'can_be_booked_single'];
+    protected $fillable = ['description', 'can_be_booked_single', 'vessel_id'];
 }
