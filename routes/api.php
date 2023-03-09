@@ -45,3 +45,9 @@ Route::group([
     Route::post('update', Controllers\Vessels\UpdateVessel::class);
     Route::post('delete/{id}', Controllers\Vessels\DeleteVessel::class);
 });
+
+Route::group([
+    'prefix' => 'cabins'
+    ], function () {
+    Route::post('create', Controllers\Cabins\CreateVesselCabin::class);
+});
