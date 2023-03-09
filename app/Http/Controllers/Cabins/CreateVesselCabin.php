@@ -19,10 +19,11 @@ class CreateVesselCabin extends Controller
     public function __invoke(Request $request)
     {
         $validatedData = Validator::make($request->all(), [
-            'description' => 'required|string|max:255',
-            'max_occupancy' => 'required|integer',
+            'title'                => 'required|string|max:255',
+            'description'          => 'string|max:255',
+            'max_occupancy'        => 'required|integer',
             'can_be_booked_single' => 'boolean',
-            'vessel_id' => 'required|integer'
+            'vessel_id'            => 'required|integer'
         ]);
 
         if ($validatedData->fails()) {

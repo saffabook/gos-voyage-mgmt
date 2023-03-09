@@ -16,6 +16,7 @@ class CreateVesselCabinsTable extends Migration
         Schema::create('vessel_cabins', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->text('title');
             $table->text('description');
             $table->integer('max_occupancy');
             $table->boolean('can_be_booked_single')->default(1);
