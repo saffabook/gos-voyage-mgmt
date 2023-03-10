@@ -17,11 +17,11 @@ class CreateVesselsTable extends Migration
             $table->id();
             $table->timestamps();
             $table->string('name')->unique();
-            $table->string('vessel_type');
-            $table->date('year_built');
-            $table->integer('length_overall');
-            $table->integer('length_on_deck');
-            $table->longText('description');
+            $table->string('vessel_type')->nullable();
+            $table->date('year_built')->nullable();
+            $table->integer('length_overall')->nullable();
+            $table->integer('length_on_deck')->nullable();
+            $table->longText('description')->nullable();
             $table->integer('company_id')->default(0);
         });
     }

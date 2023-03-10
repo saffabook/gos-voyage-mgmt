@@ -50,4 +50,8 @@ Route::group([
     'prefix' => 'cabins'
     ], function () {
     Route::post('create', Controllers\Cabins\CreateVesselCabin::class);
+    Route::post('/', Controllers\Cabins\ListVesselCabins::class);
+    Route::post('get/{id}', Controllers\Cabins\GetVesselCabin::class);
+    Route::post('update', Controllers\Cabins\UpdateVesselCabin::class);
+    Route::post('delete/{id}', Controllers\Cabins\DeleteVesselCabin::class);
 });

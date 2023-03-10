@@ -9,28 +9,26 @@ use App\Models\VesselCabin;
 use App\Helpers\ApiResponse;
 use Illuminate\Validation\Rule;
 
-class CreateVesselCabin extends Controller
+class UpdateVesselCabin extends Controller
 {
     /**
      * Handle the incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
-     * 
-     * TODO ensure number of cabins does exceed vessel capacity
      */
     public function __invoke(Request $request)
     {
         $validatedData = Validator::make($request->all(), [
+            'id' => 'required|integer|exists:vessel_cabins,id,vessel_id,'.$request->vessel_id,
             'title' => [
-                'required', 
-                'string', 
-                'max:255', 
+                'string',
+                'max:255',
                 Rule::unique('vessel_cabins')
                     ->where('vessel_id', $request->vessel_id),
             ],
             'description'          => 'string|max:255',
-            'max_occupancy'        => 'required|integer',
+            'max_occupancy'        => 'integer',
             'can_be_booked_single' => 'boolean',
             'vessel_id'            => 'required|integer|exists:vessels,id'
         ], [
@@ -42,8 +40,12 @@ class CreateVesselCabin extends Controller
             return ApiResponse::error($validatedData->messages());
         }
 
-        $cabin = VesselCabin::create($validatedData->validated());
+        $validatedData = $validatedData->validated();
+        unset($validatedData['vessel_id']);
+        $vesselCabin = VesselCabin::find($request->input('id'));
+        $vesselCabin->fill($validatedData);
+        $vesselCabin->save();
 
-        return ApiResponse::success($cabin, 'The cabin was added');
+        return ApiResponse::success($vesselCabin, 'The cabin was updated');
     }
 }
