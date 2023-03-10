@@ -20,7 +20,7 @@ class UpdateVesselCabin extends Controller
     public function __invoke(Request $request)
     {
         $validatedData = Validator::make($request->all(), [
-            'id'    => 'required|integer|exists:vessel_cabins,id',
+            'id' => 'required|integer|exists:vessel_cabins,id,vessel_id,'.$request->vessel_id,
             'title' => [
                 'string',
                 'max:255',
@@ -30,17 +30,20 @@ class UpdateVesselCabin extends Controller
             'description'          => 'string|max:255',
             'max_occupancy'        => 'integer',
             'can_be_booked_single' => 'boolean',
-            'vessel_id'            => 'integer'
+            'vessel_id'            => 'required|integer|exists:vessels,id'
         ], [
-            'title.unique' => 'This vessel already has a cabin with that name.'
+            'title.unique' => 'This vessel already has a cabin with that name.',
+            'vessel_id.exists' => 'This vessel does not exist.'
         ]);
 
         if ($validatedData->fails()) {
             return ApiResponse::error($validatedData->messages());
         }
 
+        $validatedData = $validatedData->validated();
+        unset($validatedData['vessel_id']);
         $vesselCabin = VesselCabin::find($request->input('id'));
-        $vesselCabin->fill($validatedData->validated());
+        $vesselCabin->fill($validatedData);
         $vesselCabin->save();
 
         return ApiResponse::success($vesselCabin, 'The cabin was updated');

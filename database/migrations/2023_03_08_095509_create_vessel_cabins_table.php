@@ -17,10 +17,10 @@ class CreateVesselCabinsTable extends Migration
             $table->id();
             $table->timestamps();
             $table->text('title');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->integer('max_occupancy');
             $table->boolean('can_be_booked_single')->default(1);
-            $table->integer('vessel_id')->nullable();
+            $table->integer('vessel_id');
         });
     }
 
