@@ -14,6 +14,8 @@ class ListVesselCabins extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
+     * 
+     * TODO: list vessels with cabins for relationships
      */
     public function __invoke(Request $request)
     {
