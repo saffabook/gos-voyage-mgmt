@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class VesselCabin extends Model
 {
@@ -16,4 +17,14 @@ class VesselCabin extends Model
         'can_be_booked_single',
         'vessel_id'
     ];
+
+    /**
+     * Get the vessel that owns the VesselCabin
+     *
+     * @return BelongsTo
+     */
+    public function vessel()
+    {
+        return $this->belongsTo(Vessel::class);
+    }
 }
