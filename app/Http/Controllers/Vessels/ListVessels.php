@@ -17,7 +17,7 @@ class ListVessels extends Controller
      */
     public function __invoke()
     {
-        $vesselsFromDb = Vessel::get();
+        $vesselsFromDb = Vessel::with('cabins')->get();
 
         if ($vesselsFromDb->isEmpty()) {
           return ApiResponse::error('No vessels found');
