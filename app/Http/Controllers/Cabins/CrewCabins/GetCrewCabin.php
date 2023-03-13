@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Vessels;
+namespace App\Http\Controllers\Cabins\CrewCabins;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Vessel;
+use App\Models\CrewCabin;
 use App\Helpers\ApiResponse;
 
-class GetVessel extends Controller
+class GetCrewCabin extends Controller
 {
     /**
      * Handle the incoming request.
@@ -17,12 +17,12 @@ class GetVessel extends Controller
      */
     public function __invoke($id)
     {
-        $vessel = Vessel::with('cabins', 'crew_cabins')->find($id);
+        $crewCabin = CrewCabin::with('vessel')->find($id);
 
-        if (empty($vessel)) {
-            return ApiResponse::error('Vessel not found');
+        if (empty($crewCabin)) {
+            return ApiResponse::error('Cabin not found');
         }
 
-        return ApiResponse::success($vessel);
+        return ApiResponse::success($crewCabin);
     }
 }

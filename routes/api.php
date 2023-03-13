@@ -55,3 +55,13 @@ Route::group([
     Route::post('update', Controllers\Cabins\UpdateVesselCabin::class);
     Route::post('delete/{id}', Controllers\Cabins\DeleteVesselCabin::class);
 });
+
+Route::group([
+    'prefix' => 'crew-cabins'
+    ], function () {
+    Route::post('create', Controllers\Cabins\CrewCabins\CreateCrewCabin::class);
+    Route::post('/', Controllers\Cabins\CrewCabins\ListCrewCabins::class);
+    Route::post('get/{id}', Controllers\Cabins\CrewCabins\GetCrewCabin::class);
+    Route::post('update', Controllers\Cabins\CrewCabins\UpdateCrewCabin::class);
+    Route::post('delete/{id}', Controllers\Cabins\CrewCabins\DeleteCrewCabin::class);
+});

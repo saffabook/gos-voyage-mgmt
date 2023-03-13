@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Vessel;
 use App\Models\VesselCabin;
+use App\Models\CrewCabin;
 use App\Helpers\ApiResponse;
 
 class DeleteVessel extends Controller
@@ -18,7 +19,7 @@ class DeleteVessel extends Controller
      */
     public function __invoke($id)
     {
-        $vessel = Vessel::with('cabins')->find($id);
+        $vessel = Vessel::with('cabins', 'crew_cabins')->find($id);
 
         if (empty($vessel)) {
             return ApiResponse::error('Vessel not found');
@@ -26,6 +27,7 @@ class DeleteVessel extends Controller
 
         $vessel->delete();
         VesselCabin::where('vessel_id', $id)->delete();
+        CrewCabin::where('vessel_id', $id)->delete();
 
         return ApiResponse::success($vessel, 'Vessel deleted successfully');
     }

@@ -29,4 +29,14 @@ class Vessel extends Model
     {
         return $this->hasMany(VesselCabin::class);
     }
+
+    /**
+     * Get all of the crew_cabins for the Vessel
+     *
+     * @return HasMany
+     */
+    public function crew_cabins()
+    {
+        return $this->hasMany(CrewCabin::class);
+    }
 }
