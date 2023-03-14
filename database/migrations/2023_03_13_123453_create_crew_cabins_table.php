@@ -18,6 +18,7 @@ class CreateCrewCabinsTable extends Migration
             $table->timestamps();
             $table->text('title');
             $table->text('description')->nullable();
+            $table->integer('max_occupancy');
             $table->integer('vessel_id');
         });
     }

@@ -19,7 +19,7 @@ class DeleteVessel extends Controller
      */
     public function __invoke($id)
     {
-        $vessel = Vessel::with('cabins', 'crew_cabins')->find($id);
+        $vessel = Vessel::find($id);
 
         if (empty($vessel)) {
             return ApiResponse::error('Vessel not found');

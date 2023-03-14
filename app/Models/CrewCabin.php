@@ -13,6 +13,7 @@ class CrewCabin extends Model
     protected $fillable = [
         'title',
         'description',
+        'max_occupancy',
         'vessel_id'
     ];
 

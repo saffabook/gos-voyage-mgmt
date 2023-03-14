@@ -27,8 +27,9 @@ class CreateCrewCabin extends Controller
                 Rule::unique('crew_cabins')
                     ->where('vessel_id', $request->vessel_id),
             ],
-            'description' => 'string|max:255',
-            'vessel_id'   => 'required|integer|exists:vessels,id'
+            'description'   => 'string|max:255',
+            'max_occupancy' => 'required|integer',
+            'vessel_id'     => 'required|integer|exists:vessels,id'
         ], [
             'title.unique'     => 'This vessel already has a cabin with that name.',
             'vessel_id.exists' => 'This vessel does not exist.'
