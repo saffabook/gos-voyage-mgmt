@@ -65,3 +65,18 @@ Route::group([
     Route::post('update', Controllers\Cabins\CrewCabins\UpdateCrewCabin::class);
     Route::post('delete/{id}', Controllers\Cabins\CrewCabins\DeleteCrewCabin::class);
 });
+
+Route::group([
+    'prefix' => 'cabin-additionals'
+    ], function () {
+    Route::post('create', 
+        Controllers\Cabins\MetaData\CreateVesselCabinAdditionals::class);
+    Route::post('/', 
+        Controllers\Cabins\MetaData\ListVesselCabinAdditionals::class);
+    Route::post('get/{id}', 
+        Controllers\Cabins\MetaData\GetVesselCabinAdditionals::class);
+    Route::post('update', 
+        Controllers\Cabins\MetaData\UpdateVesselCabinAdditionals::class);
+    Route::post('delete/{id}', 
+        Controllers\Cabins\MetaData\DeleteVesselCabinAdditionals::class);
+});
