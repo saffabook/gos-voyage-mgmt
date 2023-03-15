@@ -17,7 +17,7 @@ class GetVesselCabin extends Controller
      */
     public function __invoke($id)
     {
-        $vesselCabin = VesselCabin::with('vessel')->find($id);
+        $vesselCabin = VesselCabin::with('additionals', 'vessel')->find($id);
 
         if (empty($vesselCabin)) {
             return ApiResponse::error('Cabin not found');
