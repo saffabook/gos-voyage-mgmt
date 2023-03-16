@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\VesselCabin;
 use App\Helpers\ApiResponse;
+use App\Models\VesselCabinAdditionals;
 
 class DeleteVesselCabin extends Controller
 {
@@ -24,6 +25,7 @@ class DeleteVesselCabin extends Controller
         }
 
         $vesselCabin->delete();
+        VesselCabinAdditionals::where('cabin_id', $id)->delete();
 
         return ApiResponse::success($vesselCabin, 'Cabin deleted successfully');
     }

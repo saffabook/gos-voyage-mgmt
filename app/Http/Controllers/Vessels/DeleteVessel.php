@@ -8,6 +8,7 @@ use App\Models\Vessel;
 use App\Models\VesselCabin;
 use App\Models\CrewCabin;
 use App\Helpers\ApiResponse;
+use App\Models\VesselCabinAdditionals;
 
 class DeleteVessel extends Controller
 {
@@ -25,9 +26,12 @@ class DeleteVessel extends Controller
             return ApiResponse::error('Vessel not found');
         }
 
+        $vesselCabin = VesselCabin::where('vessel_id', $id)->get();
+        foreach ($vesselCabin as $key => $cabin) {
+            VesselCabinAdditionals::where('cabin_id', $cabin->id)->delete();
+            $cabin->delete();
+        }
         $vessel->delete();
-        VesselCabin::where('vessel_id', $id)->delete();
-        CrewCabin::where('vessel_id', $id)->delete();
 
         return ApiResponse::success($vessel, 'Vessel deleted successfully');
     }

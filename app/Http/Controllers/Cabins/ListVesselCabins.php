@@ -19,7 +19,7 @@ class ListVesselCabins extends Controller
      */
     public function __invoke(Request $request)
     {
-        $vesselCabinsFromDb = VesselCabin::get();
+        $vesselCabinsFromDb = VesselCabin::with('additionals')->get();
 
         if ($vesselCabinsFromDb->isEmpty()) {
           return ApiResponse::error('No cabins found');
