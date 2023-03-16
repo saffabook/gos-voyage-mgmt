@@ -18,7 +18,9 @@ class ListVessels extends Controller
     public function __invoke()
     {
         $vesselsFromDb = Vessel::with(
-            'cabins', 'cabins.additionals', 'crew_cabins'
+            'cabins',
+            'cabins.additionals',
+            'crew_cabins'
         )->get();
 
         if ($vesselsFromDb->isEmpty()) {

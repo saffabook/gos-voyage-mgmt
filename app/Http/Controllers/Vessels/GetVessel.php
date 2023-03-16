@@ -18,7 +18,9 @@ class GetVessel extends Controller
     public function __invoke($id)
     {
         $vessel = Vessel::with(
-            'cabins', 'cabins.additionals', 'crew_cabins'
+            'cabins',
+            'cabins.additionals',
+            'crew_cabins'
         )->find($id);
 
         if (empty($vessel)) {
