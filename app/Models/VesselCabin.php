@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class VesselCabin extends Model
 {
@@ -30,12 +30,12 @@ class VesselCabin extends Model
     }
 
     /**
-     * Get the additionals associated with the VesselCabin
+     * Get all of the additionals for the VesselCabin
      *
-     * @return HasOne
+     * @return HasMany
      */
     public function additionals()
     {
-        return $this->hasOne(VesselCabinAdditionals::class, 'cabin_id');
+        return $this->hasMany(VesselCabinAdditionals::class, 'cabin_id');
     }
 }
