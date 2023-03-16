@@ -26,16 +26,11 @@ class DeleteVessel extends Controller
             return ApiResponse::error('Vessel not found');
         }
 
-        // Get all cabins that belong to a vessel
         $vesselCabin = VesselCabin::where('vessel_id', $id)->get();
-        // Loop over its cabins and delete its additionals and itself (cabin)
         foreach ($vesselCabin as $key => $cabin) {
-            // Delete the additionals
             VesselCabinAdditionals::where('cabin_id', $cabin->id)->delete();
-            // Delete the cabin
             $cabin->delete();
         }
-        // Delete the vessel
         $vessel->delete();
 
         return ApiResponse::success($vessel, 'Vessel deleted successfully');
