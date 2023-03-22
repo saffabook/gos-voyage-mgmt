@@ -19,7 +19,7 @@ class CreateVesselVoyages extends Migration
             $table->string('title')->unique();
             $table->longtext('description');
             $table->integer('vesselId');
-            $table->string('voyageType');
+            $table->enum('voyageType', ['ROUNDTRIP', 'ONEWAY', 'DAYTRIP']);
             $table->string('voyageReferenceNumber');
             $table->boolean('isPassportRequired')->default(1);
             $table->integer('embarkPortId');
@@ -29,7 +29,8 @@ class CreateVesselVoyages extends Migration
             $table->date('endDate');
             $table->time('endTime');
             $table->integer('companyId')->default(0);
-            $table->enum('voyageStatus', ['active', 'cancelled'])->default('active');
+            $table->enum('voyageStatus', ['DRAFT', 'ACTIVE', 'CANCELLED'])
+                  ->default('active');
         });
     }
 
