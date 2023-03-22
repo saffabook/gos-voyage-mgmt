@@ -80,3 +80,9 @@ Route::group([
     Route::post('delete/{id}', 
         Controllers\Cabins\MetaData\DeleteVesselCabinAdditionals::class);
 });
+
+Route::group([
+    'prefix' => 'voyages'
+    ], function () {
+    Route::post('create', Controllers\Voyages\CreateVesselVoyage::class);
+});
