@@ -18,7 +18,7 @@ class CreateVoyagePort extends Controller
      */
     public function __invoke(Request $request)
     {
-        // $companyId = 0;
+        $companyId = 0;
 
         $validatedData = Validator::make($request->all(), [
             'title' => 'required|string|unique:voyage_ports|max:255',
@@ -31,7 +31,7 @@ class CreateVoyagePort extends Controller
 
         $validatedData = $validatedData->validated();
 
-        // $validatedData['companyId'] = $companyId;
+        $validatedData['companyId'] = $companyId;
 
         // This is dummy data until we create addresses table
         $validatedData['addressId'] = 42;
