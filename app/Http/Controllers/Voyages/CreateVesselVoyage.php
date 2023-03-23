@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\VesselVoyage;
 use App\Helpers\ApiResponse;
 use App\Models\Vessel;
+use Illuminate\Validation\Rule;
 
 class CreateVesselVoyage extends Controller
 {
@@ -28,10 +29,13 @@ class CreateVesselVoyage extends Controller
             'voyageType' => 'in:ROUNDTRIP,ONEWAY,DAYTRIP',
             'isPassportRequired' => 'boolean',
 
+            'embarkPortId' => 'required|integer|exists:voyage_ports,id',
+            'disembarkPortId' => 'required|integer|exists:voyage_ports,id',
+
             // 'embarkPortId' => [
             //     'required',
-            //     Rule::exists('ports')->where(function ($query) use ($request) {
-            //         $query->where('id', $request->embarkPortId)
+            //     Rule::exists('voyage_ports')->where(function ($query) use ($request) {
+            //         $query->where('id', $request->embarkPortId);
             //     }),
             // ],
 
@@ -40,7 +44,9 @@ class CreateVesselVoyage extends Controller
             'endDate' => 'required|date_format:Y-m-d',
             'endTime' => 'required|date_format:H:i',
         ], [
-            'title.unique' => 'A voyage with that name already exists.'
+            'title.unique' => 'A voyage with that name already exists.',
+            'embarkPortId.exists' => 'The embark port does not exist.',
+            'disembarkPortId.exists' => 'The disembark port does not exist.'
         ]);
 
         if ($validatedData->fails()) {
@@ -61,10 +67,10 @@ class CreateVesselVoyage extends Controller
         $validatedData['voyageReferenceNumber'] = '1234';
 
         // This is dummy data until we create ports table
-        $validatedData['embarkPortId'] = 42;
+        // $validatedData['embarkPortId'] = 42;
 
         // This is dummy data until we create ports table
-        $validatedData['disembarkPortId'] = 42;
+        // $validatedData['disembarkPortId'] = 42;
 
         $voyage = VesselVoyage::create($validatedData);
 
