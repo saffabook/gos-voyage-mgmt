@@ -15,9 +15,11 @@ class GetVesselVoyage extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke($id)
+    public function __invoke($voyageReferenceNumber)
     {
-        $voyage = VesselVoyage::find($id);
+        $voyage = VesselVoyage::where(
+            'voyageReferenceNumber', $voyageReferenceNumber
+        )->first();
 
         if (empty($voyage)) {
             return ApiResponse::error('Voyage not found');
