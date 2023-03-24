@@ -12,6 +12,7 @@ class VoyagePort extends Model
     protected $fillable = [
         'title',
         'description',
+        'directions',
         'longitude',
         'latitude',
         'addressId',
