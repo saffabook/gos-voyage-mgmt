@@ -10,6 +10,8 @@ class VesselVoyage extends Model
 {
     use HasFactory;
 
+    public static $snakeAttributes = false;
+
     protected $fillable = [
         'title',
         'description',
