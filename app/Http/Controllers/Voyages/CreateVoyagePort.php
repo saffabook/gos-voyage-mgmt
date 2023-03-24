@@ -21,8 +21,9 @@ class CreateVoyagePort extends Controller
         $companyId = 0;
 
         $validatedData = Validator::make($request->all(), [
-            'title' => 'required|string|unique:voyage_ports|max:255',
+            'title'       => 'required|string|unique:voyage_ports|max:255',
             'description' => 'string|between:30,600',
+            'directions'  => 'string|max:255'
         ]);
 
         if ($validatedData->fails()) {
