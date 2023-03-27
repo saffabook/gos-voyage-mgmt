@@ -54,6 +54,15 @@ class CreateVesselVoyage extends Controller
 
         $validatedData = $validatedData->validated();
 
+        $vesselIsBooked = VesselVoyage::where('vesselId', $validatedData['vesselId'])
+            ->whereDate('startDate', '<=', $validatedData['endDate'])
+            ->whereDate('endDate', '>=', $validatedData['startDate'])
+            ->exists();
+
+        if (!empty($vesselIsBooked)) {
+            return ApiResponse::error('The vessel is already booked for this time');
+        }
+
         $validatedData['voyageReferenceNumber'] = GenerateVoyageId::execute($companyId);
 
         $voyage = VesselVoyage::create($validatedData);

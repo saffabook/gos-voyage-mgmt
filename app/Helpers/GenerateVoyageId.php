@@ -8,12 +8,13 @@ class GenerateVoyageId
 {
     public static function execute($companyId)
     {
-        $randomString = Str::lower(Str::random(10, '0123456789abcdefghijklmnopqrstuvwxyz'));
-
-        $saltRandomString = Str::lower(Str::random(2, '0123456789abcdefghijklmnopqrstuvwxyz'));
-
-        $referenceCode = $saltRandomString.'-'.$randomString.'-'.$companyId;
+        $referenceCode = self::makeRandomCode(4).'-'.self::makeRandomCode(8).'-'.$companyId;
 
         return $referenceCode;
+    }
+
+    private static function makeRandomCode($total)
+    {
+        return Str::lower(Str::random($total, '0123456789abcdefghijklmnopqrstuvwxyz'));
     }
 }
