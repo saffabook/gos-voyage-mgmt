@@ -11,24 +11,25 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class CreateVesselVoyageTest extends TestCase
 {
 
-    public function can_get_voyage_by_id()
+    public function test_create_voyage_successful()
     {
-        // $voyage = VesselVoyage::with('embarkPort', 'disembarkPort')
-        //     ->where('voyageReferenceNumber', $voyageReferenceNumber)
-        //     ->first();
+        $voyage = [
+            'title' => 'DateCheckerVoyage',
+            'description' => 'Description for DateCheckerVoyage.',
+            'vesselId' => 3,
+            'voyageType' => 'ROUNDTRIP',
+            'embarkPortId' => 1,
+            'startDate' => '2023-04-01',
+            'startTime' => '11:50',
+            'disembarkPortId' => 3,
+            'endDate' => '2023-04-10',
+            'endTime' => '16:30',
+        ];
 
-        // $post = UserFactory::factory()->create();
-        $user = factory(User::class)->make();
-
-        // $response = $this->post('/voyages/get/{id}');
+        $response = $this->postJson('/api/voyages/create', $voyage);
 
         $response->assertStatus(200);
+
+        $response->assertJson($voyage);
     }
-
-    // public function can_create_a_voyage()
-    // {
-    //     $response = $this->post('/voyages/create');
-
-    //     $response->assertStatus(200);
-    // }
 }
