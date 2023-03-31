@@ -40,8 +40,10 @@ class PostsTest extends TestCase
 
         $response->assertStatus(200);
 
-        // This fails. 
-        $response->assertJson($post);
+        // This now passes.
+        $response->assertJson([
+            'data' => $post
+        ]);
     }
 
     public function test_api_post_invalid_store_returns_error()
@@ -64,8 +66,10 @@ class PostsTest extends TestCase
 
         $response->assertStatus(200);
 
-        // This fails. 
-        $response->assertJson([$post->toArray()]);
+        // This now passes.
+        $response->assertJson([
+            'data' => [$post->toArray()]
+        ]);
     }
 
     public function test_post_update_validation_error()
@@ -91,8 +95,10 @@ class PostsTest extends TestCase
 
         $response->assertStatus(200);
 
-        // This fails.
-        $response->assertJson([$post->toArray()]);
+        // This still fails.
+        $response->assertJson([
+            'data' => $post
+        ]);
 
         $this->assertDatabaseMissing('posts', $post->toArray());
         $this->assertDatabaseCount('posts', 0);
