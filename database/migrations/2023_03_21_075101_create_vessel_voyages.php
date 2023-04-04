@@ -30,7 +30,7 @@ class CreateVesselVoyages extends Migration
             $table->time('endTime');
             $table->integer('companyId')->default(0);
             $table->enum('voyageStatus', ['DRAFT', 'ACTIVE', 'CANCELLED'])
-                  ->default('active');
+                  ->default('ACTIVE');
         });
     }
 
