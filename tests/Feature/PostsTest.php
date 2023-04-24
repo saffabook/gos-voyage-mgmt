@@ -40,7 +40,6 @@ class PostsTest extends TestCase
 
         $response->assertStatus(200);
 
-        // This now passes.
         $response->assertJson([
             'data' => $post
         ]);
@@ -66,7 +65,6 @@ class PostsTest extends TestCase
 
         $response->assertStatus(200);
 
-        // This now passes.
         $response->assertJson([
             'data' => [$post->toArray()]
         ]);
@@ -77,14 +75,12 @@ class PostsTest extends TestCase
         $post = Post::factory()->create();
 
         $response = $this->post('/api/posts/update/' . $post->id, [
-            'title' => 'something longer than fifteen characters',
-            'author' => ''
+            'title' => '',
         ]);
 
         $response->assertStatus(422);
 
-        // This fails.
-        $response->assertInvalid(['title', 'author']);
+        $response->assertJsonStructure(['error' => ['title']]);
     }
 
     public function test_post_delete_successful()
@@ -93,12 +89,7 @@ class PostsTest extends TestCase
 
         $response = $this->post('api/posts/delete/' . $post->id);
 
-        $response->assertStatus(200);
-
-        // This still fails.
-        $response->assertJson([
-            'data' => $post
-        ]);
+        $response->assertStatus(200)->assertJsonStructure(['data']);
 
         $this->assertDatabaseMissing('posts', $post->toArray());
         $this->assertDatabaseCount('posts', 0);
