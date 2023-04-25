@@ -88,7 +88,7 @@ class CreateVesselVoyageTest extends TestCase
 
         foreach ($testCases as $testName => $overlapVoyage) {
             // Display each test case we're testing for
-            var_dump('Testing for ' . $testName);
+            // var_dump('Testing for ' . $testName);
 
             $date = Carbon::now();
 
@@ -110,6 +110,10 @@ class CreateVesselVoyageTest extends TestCase
             if (isset($jsonResponse['data'])) {
                 $jsonResponse->assertStatus(200)
                              ->assertJsonStructure(['data']);
+
+                var_dump(
+                    'Test Case: ' . $testName . ' – voyage booked successfully.'
+                );
             }
 
             // Show error message if vessel is already booked
@@ -119,6 +123,10 @@ class CreateVesselVoyageTest extends TestCase
                 $this->assertSame(
                     $jsonResponse['error'],
                     'The vessel is already booked for this time'
+                );
+
+                var_dump(
+                    'Test Case: ' . $testName . ' – voyage booking unsuccessful because the vessel is already booked.'
                 );
             }
         }
