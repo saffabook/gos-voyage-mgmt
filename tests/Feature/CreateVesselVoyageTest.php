@@ -12,252 +12,115 @@ class CreateVesselVoyageTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_create_initial_voyage_successful()
+    public function testCreateVoyageSuccessful()
     {
-        $embarkPort = VoyagePort::factory()->create();
+        $embarkPort    = VoyagePort::factory()->create();
         $disembarkPort = VoyagePort::factory()->create();
-        $vessel = Vessel::factory()->create();
+        $vessel        = Vessel::factory()->create();
+        $date          = Carbon::now();
 
         $voyage = [
-            'title' => 'DateCheckerVoyage',
-            'description' => 'Description for DateCheckerVoyage.',
-            'vesselId' => $vessel->id,
-            'voyageType' => 'ROUNDTRIP',
-            'embarkPortId' => $embarkPort->id,
-            'startDate' => '2023-04-01',
-            'startTime' => '11:50',
+            'title'           => 'DateCheckerVoyage',
+            'description'     => 'Description for DateCheckerVoyage.',
+            'vesselId'        => $vessel->id,
+            'voyageType'      => 'ROUNDTRIP',
+            'embarkPortId'    => $embarkPort->id,
+            'startDate'       => $date->addDay()->toDateString(),
+            'startTime'       => '11:50',
             'disembarkPortId' => $disembarkPort->id,
-            'endDate' => '2023-04-10',
-            'endTime' => '16:30',
+            'endDate'         => $date->addDays(10)->toDateString(),
+            'endTime'         => '16:30',
         ];
 
         $response = $this->postJson('/api/voyages/create', $voyage);
 
         $response->assertStatus(200);
-
         $response->assertJson([
             'data' => $voyage
         ]);
     }
 
-    public function test_create_voyage_double_booking_vessel_scenario_one()
+    public function testCreateVoyageDoubleBookingVessel()
     {
+        $date = Carbon::now();
 
-        $today = Carbon::now();
-        
+        /**
+         * Test Cases: 
+         * 'Last week' - can we book last week if there were no bookings last week?
+         * 'This week' - can we book this week if there are no bookings this week?
+         * 'Next week' - can we create booking if start date is within 'This week'?
+         * 'Overlap' - can we create booking if start date is within 'This week' and end date is within 'Next week'?
+         * 
+         */
         $testCases = [
-            'Test One' => [
-                'startDate' => '2023-03-30',
-                'endDate' => '2023-04-01',
+            'Last week' => [
+                'startDateFromNow' => -8,
+                'endDateFromNow'   => -1,
             ],
-            'Test Two' => [
-                'startDate' => '2023-04-01',
-                'endDate' => '2023-04-10',
+            'This week' => [
+                'startDateFromNow' => 0,
+                'endDateFromNow'   => 7,
             ],
-            
-            'Test Two' => [
-                'startDate' => '2023-04-01',
-                'endDate' => '2023-04-10',
+            'Next week' => [
+                'startDateFromNow' => 7,
+                'endDateFromNow'   => 14,
+            ],
+            'Overlap' => [
+                'startDateFromNow' => 5,
+                'endDateFromNow'   => 8,
             ],
         ];
 
-        $embarkPort = VoyagePort::factory()->create();
+        $embarkPort    = VoyagePort::factory()->create();
         $disembarkPort = VoyagePort::factory()->create();
-        $vessel = Vessel::factory()->create();
+        $vessel        = Vessel::factory()->create();
 
-        $initialVoyage = [
-            'title' => 'DateCheckerVoyage',
-            'description' => 'Description for DateCheckerVoyage.',
-            'vesselId' => $vessel->id,
-            'voyageType' => 'ROUNDTRIP',
-            'embarkPortId' => $embarkPort->id,
-            'startDate' => '2023-04-01',
-            'startTime' => '11:50',
+        $defaultData = [
+            'title'           => 'DateCheckerVoyage',
+            'description'     => 'Description for DateCheckerVoyage.',
+            'vesselId'        => $vessel->id,
+            'voyageType'      => 'ROUNDTRIP',
+            'embarkPortId'    => $embarkPort->id,
+            'startTime'       => '11:50',
             'disembarkPortId' => $disembarkPort->id,
-            'endDate' => '2023-04-10',
-            'endTime' => '16:30',
+            'endTime'         => '16:30',
         ];
-        $initialResponse = $this->postJson('/api/voyages/create', $initialVoyage);
-        $initialResponse->assertStatus(200);
-        $initialResponse->assertJson([
-            'data' => $initialVoyage
-        ]);
 
         foreach ($testCases as $testName => $overlapVoyage) {
-            $defaultValues = [
-                'title' => $testName,
-                'description' => 'Description for DateCheckerVoyage.',
-                'vesselId' => $vessel->id,
-                'voyageType' => 'ROUNDTRIP',
-                'embarkPortId' => $embarkPort->id,
-                'startTime' => '11:50',
-                'disembarkPortId' => $disembarkPort->id,
-                'endTime' => '16:30',
-            ];
-            $defaultValues['startDate'] = $overlapVoyage['startDate'];
-            $defaultValues['endDate'] = $overlapVoyage['endDate'];
+            // Display each test case we're testing for
+            var_dump('Testing for ' . $testName);
 
-            $overlapResponse = $this->postJson('/api/voyages/create', $defaultValues);
-            $overlapResponse->assertStatus(422);
-            $this->assertSame(
-                $overlapResponse['error'],
-                'The vessel is already booked for this time'
+            $date = Carbon::now();
+
+            $startDate = $date->addDays($overlapVoyage['startDateFromNow'])
+                              ->toDateString();
+
+            $endDate = $date->addDays($overlapVoyage['endDateFromNow'])
+                            ->toDateString();
+
+            $defaultData['endDate']   = $endDate;
+            $defaultData['startDate'] = $startDate;
+            $defaultData['title']     = $testName;
+
+            $jsonResponse = $this->postJson(
+                '/api/voyages/create', $defaultData
             );
+
+            // Show successful response if voyage is booked successfully
+            if (isset($jsonResponse['data'])) {
+                $jsonResponse->assertStatus(200)
+                             ->assertJsonStructure(['data']);
+            }
+
+            // Show error message if vessel is already booked
+            if (isset($jsonResponse['error'])) {
+                $jsonResponse->assertStatus(422);
+
+                $this->assertSame(
+                    $jsonResponse['error'],
+                    'The vessel is already booked for this time'
+                );
+            }
         }
-
-        // $overlapVoyage = [
-        //     'title' => 'OverlapOneTest',
-        //     'description' => 'This is the description for OverlapOneTest.',
-        //     'vesselId' => $vessel->id,
-        //     'voyageType' => 'ROUNDTRIP',
-        //     'embarkPortId' => $embarkPort->id,
-        //     'startDate' => '2023-03-30',
-        //     'startTime' => '11:50',
-        //     'disembarkPortId' => $disembarkPort->id,
-        //     'endDate' => '2023-04-01',
-        //     'endTime' => '16:30',
-        // ];
-
-        // $overlapResponse = $this->postJson('/api/voyages/create', $overlapVoyage);
-        // $overlapResponse->assertStatus(422);
-        // $this->assertSame(
-        //     $overlapResponse['error'],
-        //     'The vessel is already booked for this time'
-        // );
     }
-
-    // public function test_create_voyage_double_booking_vessel_scenario_two()
-    // {
-    //     $embarkPort = VoyagePort::factory()->create();
-    //     $disembarkPort = VoyagePort::factory()->create();
-    //     $vessel = Vessel::factory()->create();
-
-    //     $initialVoyage = [
-    //         'title' => 'DateCheckerVoyage',
-    //         'description' => 'Description for DateCheckerVoyage.',
-    //         'vesselId' => $vessel->id,
-    //         'voyageType' => 'ROUNDTRIP',
-    //         'embarkPortId' => $embarkPort->id,
-    //         'startDate' => '2023-04-01',
-    //         'startTime' => '11:50',
-    //         'disembarkPortId' => $disembarkPort->id,
-    //         'endDate' => '2023-04-10',
-    //         'endTime' => '16:30',
-    //     ];
-    //     $initialResponse = $this->postJson('/api/voyages/create', $initialVoyage);
-    //     $initialResponse->assertStatus(200);
-    //     $initialResponse->assertJson([
-    //         'data' => $initialVoyage
-    //     ]);
-
-    //     $overlapVoyage = [
-    //         'title' => 'OverlapTwoTest',
-    //         'description' => 'This is the description for OverlapTwoTest.',
-    //         'vesselId' => $vessel->id,
-    //         'voyageType' => 'ROUNDTRIP',
-    //         'embarkPortId' => $embarkPort->id,
-    //         'startDate' => '2023-03-30',
-    //         'startTime' => '11:50',
-    //         'disembarkPortId' => $disembarkPort->id,
-    //         'endDate' => '2023-04-02',
-    //         'endTime' => '16:30',
-    //     ];
-
-    //     $overlapResponse = $this->postJson('/api/voyages/create', $overlapVoyage);
-    //     $overlapResponse->assertStatus(422);
-    //     $this->assertSame(
-    //         $overlapResponse['error'],
-    //         'The vessel is already booked for this time'
-    //     );
-    // }
-
-    // public function test_create_voyage_double_booking_vessel_scenario_three()
-    // {
-    //     $embarkPort = VoyagePort::factory()->create();
-    //     $disembarkPort = VoyagePort::factory()->create();
-    //     $vessel = Vessel::factory()->create();
-
-    //     $initialVoyage = [
-    //         'title' => 'DateCheckerVoyage',
-    //         'description' => 'Description for DateCheckerVoyage.',
-    //         'vesselId' => $vessel->id,
-    //         'voyageType' => 'ROUNDTRIP',
-    //         'embarkPortId' => $embarkPort->id,
-    //         'startDate' => '2023-04-01',
-    //         'startTime' => '11:50',
-    //         'disembarkPortId' => $disembarkPort->id,
-    //         'endDate' => '2023-04-10',
-    //         'endTime' => '16:30',
-    //     ];
-    //     $initialResponse = $this->postJson('/api/voyages/create', $initialVoyage);
-    //     $initialResponse->assertStatus(200);
-    //     $initialResponse->assertJson([
-    //         'data' => $initialVoyage
-    //     ]);
-
-    //     $overlapVoyage = [
-    //         'title' => 'OverlapThreeTest',
-    //         'description' => 'This is the description for OverlapThreeTest.',
-    //         'vesselId' => $vessel->id,
-    //         'voyageType' => 'ROUNDTRIP',
-    //         'embarkPortId' => $embarkPort->id,
-    //         'startDate' => '2023-04-09',
-    //         'startTime' => '11:50',
-    //         'disembarkPortId' => $disembarkPort->id,
-    //         'endDate' => '2023-04-12',
-    //         'endTime' => '16:30',
-    //     ];
-
-    //     $overlapResponse = $this->postJson('/api/voyages/create', $overlapVoyage);
-    //     $overlapResponse->assertStatus(422);
-    //     $this->assertSame(
-    //         $overlapResponse['error'],
-    //         'The vessel is already booked for this time'
-    //     );
-    // }
-
-    // public function test_create_voyage_double_booking_vessel_scenario_four()
-    // {
-    //     $embarkPort = VoyagePort::factory()->create();
-    //     $disembarkPort = VoyagePort::factory()->create();
-    //     $vessel = Vessel::factory()->create();
-
-    //     $initialVoyage = [
-    //         'title' => 'DateCheckerVoyage',
-    //         'description' => 'Description for DateCheckerVoyage.',
-    //         'vesselId' => $vessel->id,
-    //         'voyageType' => 'ROUNDTRIP',
-    //         'embarkPortId' => $embarkPort->id,
-    //         'startDate' => '2023-04-01',
-    //         'startTime' => '11:50',
-    //         'disembarkPortId' => $disembarkPort->id,
-    //         'endDate' => '2023-04-10',
-    //         'endTime' => '16:30',
-    //     ];
-    //     $initialResponse = $this->postJson('/api/voyages/create', $initialVoyage);
-    //     $initialResponse->assertStatus(200);
-    //     $initialResponse->assertJson([
-    //         'data' => $initialVoyage
-    //     ]);
-
-    //     $overlapVoyage = [
-    //         'title' => 'OverlapFourTest',
-    //         'description' => 'This is the description for OverlapFourTest.',
-    //         'vesselId' => $vessel->id,
-    //         'voyageType' => 'ROUNDTRIP',
-    //         'embarkPortId' => $embarkPort->id,
-    //         'startDate' => '2023-04-10',
-    //         'startTime' => '11:50',
-    //         'disembarkPortId' => $disembarkPort->id,
-    //         'endDate' => '2023-04-12',
-    //         'endTime' => '16:30',
-    //     ];
-
-    //     $overlapResponse = $this->postJson('/api/voyages/create', $overlapVoyage);
-    //     $overlapResponse->assertStatus(422);
-    //     $this->assertSame(
-    //         $overlapResponse['error'],
-    //         'The vessel is already booked for this time'
-    //     );
-    // }
 }
