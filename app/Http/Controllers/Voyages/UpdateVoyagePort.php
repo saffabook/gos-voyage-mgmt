@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Voyages;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Models\VoyagePort;
 use App\Helpers\ApiResponse;
+use App\Models\VoyagePort;
 
-class CreateVoyagePort extends Controller
+class UpdateVoyagePort extends Controller
 {
     /**
      * Handle the incoming request.
@@ -18,10 +18,9 @@ class CreateVoyagePort extends Controller
      */
     public function __invoke(Request $request)
     {
-        $companyId = 0;
-
         $validatedData = Validator::make($request->all(), [
-            'title'       => 'required|string|unique:voyage_ports|max:255',
+            'id'          => 'required|integer|exists:voyage_ports,id',
+            'title'       => 'required|string|unique:voyage_ports|max:255'.$request->id,
             'description' => 'string|between:30,600',
             'directions'  => 'string|max:255'
         ], [
@@ -32,15 +31,10 @@ class CreateVoyagePort extends Controller
             return ApiResponse::error($validatedData->messages());
         }
 
-        $validatedData = $validatedData->validated();
+        $port = VoyagePort::find($request->input('id'));
+        $port->fill($validatedData->validated());
+        $port->save();
 
-        $validatedData['companyId'] = $companyId;
-
-        // This is dummy data until we create addresses table
-        $validatedData['addressId'] = 42;
-
-        $port = VoyagePort::create($validatedData);
-
-        return ApiResponse::success($port, 'The port was created');
+        return ApiResponse::success($port, 'The voyage port has been updated');
     }
 }

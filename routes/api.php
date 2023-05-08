@@ -92,4 +92,7 @@ Route::group([
     'prefix' => 'ports'
     ], function () {
     Route::post('create', Controllers\Voyages\CreateVoyagePort::class);
+    Route::post('get/{id}', Controllers\Voyages\GetVoyagePort::class);
+    Route::post('update', Controllers\Voyages\UpdateVoyagePort::class);
+    Route::post('delete/{id}', Controllers\Voyages\DeleteVoyagePort::class);
 });
