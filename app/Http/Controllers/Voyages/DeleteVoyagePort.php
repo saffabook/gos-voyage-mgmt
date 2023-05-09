@@ -17,7 +17,9 @@ class DeleteVoyagePort extends Controller
      */
     public function __invoke($id)
     {
-        $port = VoyagePort::find($id);
+        $companyId = 0;
+
+        $port = VoyagePort::where('companyId', $companyId)->find($id);
 
         if (empty($port)) {
             return ApiResponse::error('Port not found');

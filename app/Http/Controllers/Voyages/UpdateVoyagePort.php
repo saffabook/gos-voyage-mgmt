@@ -18,6 +18,8 @@ class UpdateVoyagePort extends Controller
      */
     public function __invoke(Request $request)
     {
+        $companyId = 0;
+
         $validatedData = Validator::make($request->all(), [
             'id'          => 'required|integer|exists:voyage_ports,id',
             'title'       => 'required|string|unique:voyage_ports|max:255'.$request->id,
@@ -31,8 +33,11 @@ class UpdateVoyagePort extends Controller
             return ApiResponse::error($validatedData->messages());
         }
 
-        $port = VoyagePort::find($request->input('id'));
+        $port = VoyagePort::where('companyId', $companyId)
+            ->find($request->input('id'));
+
         $port->fill($validatedData->validated());
+
         $port->save();
 
         return ApiResponse::success($port, 'The voyage port has been updated');
