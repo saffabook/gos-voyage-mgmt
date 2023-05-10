@@ -17,8 +17,8 @@ class CreateVoyagePorts extends Migration
             $table->id();
             $table->timestamps();
             $table->string('title');
-            $table->longtext('description');
-            $table->string('directions');
+            $table->longtext('description')->nullable();
+            $table->string('directions')->nullable();
             $table->string('longitude')->nullable();
             $table->string('latitude')->nullable();
             $table->integer('addressId');

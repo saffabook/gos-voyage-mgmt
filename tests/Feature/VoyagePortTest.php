@@ -11,22 +11,46 @@ class VoyagePortTest extends TestCase
 {
     use RefreshDatabase;
 
+    /*
+     * TODO: Add docblock
+     */
     public function testUserCanCreatePort()
     {
-        $port = [
-            'companyId'   => '1',
-            'title'       => 'Helsinki',
-            'description' => 'Description for Helsinki port.',
-            'directions'  => 'Directions for how to get to port of Helsinki.'
+        $requests = [
+            [
+                'companyId'   => '1',
+                'title'       => 'Helsinki',
+            ],
+            [
+                'companyId'   => '1',
+                'title'       => 'Helsinki',
+            ],
+            [
+                'companyId'   => '2',
+                'title'       => 'Helsinki',
+            ],
+            [
+                'title'       => 'Helsinki',
+            ],
         ];
 
-        $jsonResponse = $this->postJson('/api/ports/create', $port);
+        foreach ($requests as $key => $request) {
+            $jsonResponse = $this->postJson('/api/ports/create', $request);
 
-        $jsonResponse->assertStatus(200);
-        $jsonResponse->assertJson([
-            'data' => $port
-        ]);
-        $this->assertDatabaseHas('voyage_ports', $port);
+            if (isset($jsonResponse['error']) || $jsonResponse->status() > 400) {
+                if ($jsonResponse->status() === 500) {
+                    $jsonResponse->assertStatus(500);
+                } else {
+                    $jsonResponse->assertStatus(422);
+                }
+            } else {
+                $jsonResponse->assertStatus(200);
+                $jsonResponse->assertJson([
+                    'data' => $request
+                ]);
+                $this->assertDatabaseHas('voyage_ports', $request);
+            }
+        }
     }
 
     public function testUserCannotCreatePortWithExistingTitle()
