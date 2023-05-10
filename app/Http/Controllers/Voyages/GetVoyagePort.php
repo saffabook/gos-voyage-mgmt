@@ -15,11 +15,9 @@ class GetVoyagePort extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke($id)
+    public function __invoke($id, Request $request)
     {
-        $companyId = 0;
-
-        $port = VoyagePort::where('companyId', $companyId)->find($id);
+        $port = VoyagePort::where('companyId', $request->companyId)->find($id);
 
         if (empty($port)) {
             return ApiResponse::error('Port not found');
