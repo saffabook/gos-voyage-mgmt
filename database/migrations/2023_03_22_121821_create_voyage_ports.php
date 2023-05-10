@@ -16,13 +16,13 @@ class CreateVoyagePorts extends Migration
         Schema::create('voyage_ports', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('title')->unique();
+            $table->string('title');
             $table->longtext('description');
             $table->string('directions');
             $table->string('longitude')->nullable();
             $table->string('latitude')->nullable();
             $table->integer('addressId');
-            $table->integer('companyId')->default(0);
+            $table->integer('companyId');
         });
     }
 
