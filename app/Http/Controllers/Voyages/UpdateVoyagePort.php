@@ -40,7 +40,7 @@ class UpdateVoyagePort extends Controller
         }
 
         $port = VoyagePort::where('companyId', $request->input('companyId'))
-            ->find($request->input('id'));
+                          ->find($request->input('id'));
 
         if (empty($port)) {
             return ApiResponse::error('Port not found.');
