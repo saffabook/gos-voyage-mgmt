@@ -101,4 +101,58 @@ class VoyagePortTest extends TestCase
         ]);
         $this->assertDatabaseHas('voyage_ports', $port);
     }
+
+    public function testUserCanGetTheirOwnPort()
+    {
+        $port = VoyagePort::factory()->create([
+            'companyId' => '1',
+        ]);
+
+        $request = [
+            'companyId' => '1',
+        ];
+
+        $jsonResponse = $this->postJson('/api/ports/get/'.$port->id, $request);
+
+        $jsonResponse->assertStatus(200)
+            ->assertJson([
+                'data' => $port->toArray()
+            ]);
+    }
+
+    public function testUserCannotGetOtherUsersPorts()
+    {
+        $companyTwoPort = VoyagePort::factory()->create([
+            'companyId' => '2',
+            'title'     => 'Helsinki'
+        ]);
+
+        $request = [
+            'companyId' => '1',
+        ];
+
+        $jsonResponse = $this->postJson(
+            '/api/ports/get/'.$companyTwoPort->id, $request
+        );
+
+        $jsonResponse->assertStatus(422)
+            ->assertJsonMissingExact($companyTwoPort->toArray())
+            ->assertJson([
+                'error' => 'Port not found'
+            ]);
+    }
+
+    public function testUserAlertedIfPortDoesNotExist()
+    {
+        $request = [
+            'companyId' => '1',
+        ];
+
+        $jsonResponse = $this->postJson('/api/ports/get/42', $request);
+
+        $jsonResponse->assertStatus(422)
+            ->assertJson([
+                'error' => 'Port not found'
+            ]);
+    }
 }
