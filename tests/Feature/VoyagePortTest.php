@@ -155,4 +155,95 @@ class VoyagePortTest extends TestCase
                 'error' => 'Port not found'
             ]);
     }
+
+    public function testUserCanUpdateTheirOwnPort()
+    {
+        $companyOnePort = VoyagePort::factory()->create([
+            'companyId' => '1',
+        ]);
+
+        $request = [
+            'id'        => $companyOnePort->id,
+            'companyId' => $companyOnePort->companyId,
+            'title'     => 'Edited Title'
+        ];
+
+        $jsonResponse = $this->postJson('/api/ports/update', $request);
+
+        $jsonResponse->assertStatus(200)
+            ->assertJson([
+                'data' => $request
+            ]);
+
+        $this->assertDatabaseHas('voyage_ports', [
+            'title' => 'Edited Title',
+        ]);
+    }
+
+    public function testUserCannotUpdatePortTitleToBeSameAsExistingPortTitle()
+    {
+        $existingPort = VoyagePort::factory()->create([
+            'companyId' => '1',
+        ]);
+
+        $request = [
+            'id'        => '2',
+            'companyId' => '1',
+            'title'     => $existingPort->title
+        ];
+
+        $jsonResponse = $this->postJson('/api/ports/update', $request);
+
+        $jsonResponse->assertStatus(422);
+
+        $this->assertSame(
+            $jsonResponse['error']['title'][0],
+            'You have already created a port with that name.'
+        );
+    }
+
+    public function testUserCannotUpdateOtherUsersPorts()
+    {
+        $companyOnePort = VoyagePort::factory()->create([
+            'companyId' => '1',
+            'title'     => 'Helsinki'
+        ]);
+
+        $request = [
+            'id'        => $companyOnePort->id,
+            'companyId' => '2',
+            'title'     => 'Porvoo'
+        ];
+
+        $jsonResponse = $this->postJson('/api/ports/update', $request);
+
+        $jsonResponse->assertStatus(422)
+            ->assertJson([
+                'error' => 'Port not found.'
+            ]);
+    }
+
+    public function testUserCanUpdateSpecificPortToKeepSameTitle()
+    {
+        $companyOnePort = VoyagePort::factory()->create([
+            'companyId' => '1'
+        ]);
+
+        $request = [
+            'id'          => $companyOnePort->id,
+            'companyId'   => $companyOnePort->companyId,
+            'title'       => $companyOnePort->title,
+            'description' => 'Edited port description for testing purposes.',
+            'directions'  => 'Edited directions.'
+        ];
+
+        $jsonResponse = $this->postJson('/api/ports/update', $request);
+
+        $jsonResponse->assertStatus(200)
+            ->assertJson([
+                'data' => $request
+            ]);
+
+        $this->assertDatabaseHas('voyage_ports', $request);
+    }
 }
