@@ -246,4 +246,51 @@ class VoyagePortTest extends TestCase
 
         $this->assertDatabaseHas('voyage_ports', $request);
     }
+
+    public function testUserCanDeleteTheirOwnPort()
+    {
+        $companyOnePort = VoyagePort::factory()->create([
+            'companyId' => '1'
+        ]);
+
+        $request = [
+            'companyId' => $companyOnePort->companyId
+        ];
+
+        $jsonResponse = $this->postJson(
+            '/api/ports/delete/'.$companyOnePort->id, $request
+        );
+
+        $jsonResponse->assertStatus(200)
+            ->assertJsonPath('data.message', 'Port deleted successfully');
+
+        $this->assertDatabaseMissing(
+            'voyage_ports', $companyOnePort->toArray()
+        )->assertDatabaseCount('voyage_ports', 0);
+    }
+
+    public function testUserCannotDeleteOtherUsersPorts()
+    {
+        $companyOnePort = VoyagePort::factory()->create([
+            'companyId' => '1',
+        ]);
+
+        $request = [
+            'companyId' => '2',
+        ];
+
+        $jsonResponse = $this->postJson(
+            '/api/ports/delete/'.$companyOnePort->id, $request
+        );
+
+        $jsonResponse->assertStatus(422)
+            ->assertJsonMissingExact($companyOnePort->toArray())
+            ->assertJson([
+                'error' => 'Port not found'
+            ]);
+
+        $this->assertDatabaseHas('voyage_ports', [
+            'id' => $companyOnePort->id,
+        ]);
+    }
 }

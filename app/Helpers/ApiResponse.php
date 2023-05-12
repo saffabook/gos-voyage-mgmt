@@ -6,15 +6,20 @@ class ApiResponse
 {
     public static function success($data, $message = false)
     {
+        $responseData = [];
+
         if (is_string($data)) {
-            $data['message'] = $data;
+            $responseData['message'] = $data;
         }
 
-        if (is_array($data) && $message) {
-            $data['message'] = $message;
+        if (is_array($data)) {
+            $responseData = $data;
+            if ($message) {
+                $responseData['message'] = $message;
+            }
         }
 
-        return response()->json(['data' => $data], 200);
+        return response()->json(['data' => $responseData], 200);
     }
 
     public static function error($message)
