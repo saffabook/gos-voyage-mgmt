@@ -27,6 +27,6 @@ class GetVessel extends Controller
             return ApiResponse::error('Vessel not found');
         }
 
-        return ApiResponse::success($vessel);
+        return ApiResponse::success($vessel->toArray());
     }
 }

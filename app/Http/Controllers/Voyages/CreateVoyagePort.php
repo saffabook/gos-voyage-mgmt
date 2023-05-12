@@ -39,6 +39,6 @@ class CreateVoyagePort extends Controller
 
         $port = VoyagePort::create($validatedData);
 
-        return ApiResponse::success($port, 'The port was created');
+        return ApiResponse::success($port->toArray(), 'The port was created');
     }
 }

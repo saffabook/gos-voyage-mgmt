@@ -67,6 +67,8 @@ class CreateVesselVoyage extends Controller
 
         $voyage = VesselVoyage::create($validatedData);
 
-        return ApiResponse::success($voyage, 'The voyage was created');
+        return ApiResponse::success(
+            $voyage->toArray(), 'The voyage was created'
+        );
     }
 }
