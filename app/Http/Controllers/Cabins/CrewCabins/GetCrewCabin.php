@@ -23,6 +23,6 @@ class GetCrewCabin extends Controller
             return ApiResponse::error('Cabin not found');
         }
 
-        return ApiResponse::success($crewCabin);
+        return ApiResponse::success($crewCabin->toArray());
     }
 }

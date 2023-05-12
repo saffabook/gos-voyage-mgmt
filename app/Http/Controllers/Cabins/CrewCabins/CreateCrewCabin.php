@@ -41,6 +41,8 @@ class CreateCrewCabin extends Controller
 
         $crewCabin = CrewCabin::create($validatedData->validated());
 
-        return ApiResponse::success($crewCabin, 'The cabin was added');
+        return ApiResponse::success(
+            $crewCabin->toArray(), 'The cabin was created'
+        );
     }
 }

@@ -27,6 +27,6 @@ class DeletePost extends Controller
         $post->delete();
         PostComment::where('post_id', $id)->delete();
 
-        return ApiResponse::success($post, 'Post deleted successfully');
+        return ApiResponse::success('Post deleted successfully');
     }
 }

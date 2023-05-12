@@ -34,6 +34,8 @@ class UpdatePost extends Controller
 
         $post->update($validatedData->validated());
 
-        return ApiResponse::success($post, 'Post updated successfully');
+        return ApiResponse::success(
+            $post->toArray(), 'Post updated successfully'
+        );
     }
 }

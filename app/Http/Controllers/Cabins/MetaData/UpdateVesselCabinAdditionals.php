@@ -42,7 +42,7 @@ class UpdateVesselCabinAdditionals extends Controller
         $vesselCabinAdditionals->save();
 
         return ApiResponse::success(
-            $vesselCabinAdditionals, 'Cabin information updated'
+            $vesselCabinAdditionals->toArray(), 'Cabin information updated'
         );
     }
 }

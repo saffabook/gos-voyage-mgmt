@@ -25,8 +25,6 @@ class DeleteVesselCabinAdditionals extends Controller
 
         $cabinAdditionals->delete();
 
-        return ApiResponse::success(
-            $cabinAdditionals, 'Cabin information deleted successfully'
-        );
+        return ApiResponse::success('Cabin information deleted successfully');
     }
 }

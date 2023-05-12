@@ -23,6 +23,6 @@ class GetVesselCabin extends Controller
             return ApiResponse::error('Cabin not found');
         }
 
-        return ApiResponse::success($vesselCabin);
+        return ApiResponse::success($vesselCabin->toArray());
     }
 }

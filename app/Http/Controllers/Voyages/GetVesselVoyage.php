@@ -25,6 +25,6 @@ class GetVesselVoyage extends Controller
             return ApiResponse::error('Voyage not found');
         }
 
-        return ApiResponse::success($voyage);
+        return ApiResponse::success($voyage->toArray());
     }
 }

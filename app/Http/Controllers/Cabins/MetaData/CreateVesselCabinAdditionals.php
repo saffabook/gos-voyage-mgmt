@@ -34,6 +34,8 @@ class CreateVesselCabinAdditionals extends Controller
             $validatedData->validated()
         );
 
-        return ApiResponse::success($cabinAdditionals, 'Cabin information added');
+        return ApiResponse::success(
+            $cabinAdditionals->toArray(), 'Cabin information created'
+        );
     }
 }
