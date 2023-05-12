@@ -50,6 +50,8 @@ class UpdateVoyagePort extends Controller
 
         $port->save();
 
-        return ApiResponse::success($port, 'The port has been updated.');
+        return ApiResponse::success(
+            $port->toArray(), 'The port has been updated.'
+        );
     }
 }

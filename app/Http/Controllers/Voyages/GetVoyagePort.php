@@ -23,6 +23,6 @@ class GetVoyagePort extends Controller
             return ApiResponse::error('Port not found');
         }
 
-        return ApiResponse::success($port);
+        return ApiResponse::success($port->toArray());
     }
 }
