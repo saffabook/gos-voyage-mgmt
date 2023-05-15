@@ -6,6 +6,10 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\VoyagePort;
 use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\Vessel;
+use Carbon\Carbon;
+use App\Models\VesselVoyage;
+use App\Helpers\GenerateVoyageId;
 
 class VoyagePortTest extends TestCase
 {
@@ -292,5 +296,116 @@ class VoyagePortTest extends TestCase
         $this->assertDatabaseHas('voyage_ports', [
             'id' => $companyOnePort->id,
         ]);
+    }
+
+    public function testUserCannotDeleteActivePort()
+    {
+        $vessel  = Vessel::factory()->create(['companyId' => '1']);
+        $port1   = VoyagePort::factory()->create(['companyId' => '1']);
+        $port2   = VoyagePort::factory()->create(['companyId' => '1']);
+        $today   = Carbon::now();
+        $request = ['companyId' => '1'];
+
+        VesselVoyage::create([
+            'title'                 => 'Test Voyage',
+            'description'           => 'Description for TestVoyage.',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $port1->id,
+            'startDate'             => $today->subDay()->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $port2->id,
+            'endDate'               => $today->addDay()->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $request['companyId'],
+            'voyageReferenceNumber' => GenerateVoyageId::execute(
+                $request['companyId']
+            )
+        ]);
+
+        $jsonResponse = $this->postJson(
+            '/api/ports/delete/'.$port1->id, $request
+        );
+
+        $jsonResponse->assertStatus(422)
+            ->assertJson(['error' => 'Cannot delete. Port is in use.']);
+
+        $this->assertDatabaseHas('voyage_ports', ['id' => $port1->id]);
+    }
+
+    public function testUserCanDeleteInactivePort()
+    {
+        $vessel  = Vessel::factory()->create(['companyId' => '1']);
+        $port1   = VoyagePort::factory()->create(['companyId' => '1']);
+        $port2   = VoyagePort::factory()->create(['companyId' => '1']);
+        $today   = Carbon::now();
+        $request = ['companyId' => '1'];
+
+        VesselVoyage::create([
+            'title'                 => 'Test Voyage',
+            'description'           => 'Description for TestVoyage.',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $port1->id,
+            'startDate'             => $today->addDays(2)->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $port2->id,
+            'endDate'               => $today->addDays(12)->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $request['companyId'],
+            'voyageReferenceNumber' => GenerateVoyageId::execute(
+                $request['companyId']
+            )
+        ]);
+
+        $jsonResponse = $this->postJson(
+            '/api/ports/delete/'.$port2->id, $request
+        );
+
+        $jsonResponse->assertStatus(200)
+            ->assertJsonPath('data.message', 'Port deleted successfully');
+
+        $this->assertDatabaseMissing('voyage_ports', $port2->toArray())
+             ->assertDatabaseCount('voyage_ports', 1);
+    }
+
+    public function testUserCanForceDeleteActivePort()
+    {
+        $vessel  = Vessel::factory()->create(['companyId' => '1']);
+        $port1   = VoyagePort::factory()->create(['companyId' => '1']);
+        $port2   = VoyagePort::factory()->create(['companyId' => '1']);
+        $today   = Carbon::now();
+
+        $request = [
+            'companyId'   => '1',
+            'forceAction' => '1'
+        ];
+
+        VesselVoyage::create([
+            'title'                 => 'Test Voyage',
+            'description'           => 'Description for TestVoyage.',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $port1->id,
+            'startDate'             => $today->subDay()->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $port2->id,
+            'endDate'               => $today->addDay()->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $request['companyId'],
+            'voyageReferenceNumber' => GenerateVoyageId::execute(
+                $request['companyId']
+            )
+        ]);
+
+        $jsonResponse = $this->postJson(
+            '/api/ports/delete/'.$port1->id, $request
+        );
+
+        $jsonResponse->assertStatus(200)
+            ->assertJsonPath('data.message', 'Port deleted successfully');
+
+        $this->assertDatabaseMissing('voyage_ports', $port1->toArray())
+             ->assertDatabaseCount('voyage_ports', 1);
     }
 }
