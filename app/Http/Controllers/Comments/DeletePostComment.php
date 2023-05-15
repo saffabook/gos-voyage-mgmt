@@ -25,6 +25,6 @@ class DeletePostComment extends Controller
 
         $comment->delete();
 
-        return ApiResponse::success($comment, 'Comment deleted successfully');
+        return ApiResponse::success('Comment deleted successfully');
     }
 }

@@ -38,6 +38,8 @@ class UpdateVessel extends Controller
         $vessel->fill($validatedData->validated());
         $vessel->save();
 
-        return ApiResponse::success($vessel, 'The vessel was updated');
+        return ApiResponse::success(
+            $vessel->toArray(), 'The vessel has been updated'
+        );
     }
 }

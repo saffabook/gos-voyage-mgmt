@@ -35,6 +35,8 @@ class CreateVessel extends Controller
 
         $vessel = Vessel::create($validatedData->validated());
 
-        return ApiResponse::success($vessel, 'The vessel was created');
+        return ApiResponse::success(
+            $vessel->toArray(), 'The vessel was created'
+        );
     }
 }

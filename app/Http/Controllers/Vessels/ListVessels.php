@@ -27,6 +27,6 @@ class ListVessels extends Controller
           return ApiResponse::error('No vessels found');
         }
 
-        return ApiResponse::success($vesselsFromDb);
+        return ApiResponse::success($vesselsFromDb->toArray());
     }
 }

@@ -29,6 +29,6 @@ class AddPost extends Controller
 
         $title = Post::create($validatedData->validated());
 
-        return ApiResponse::success($title, 'The post was added');
+        return ApiResponse::success($title->toArray(), 'The post was added');
     }
 }

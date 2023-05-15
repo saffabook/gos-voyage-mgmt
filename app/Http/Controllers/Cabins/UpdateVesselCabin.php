@@ -46,6 +46,8 @@ class UpdateVesselCabin extends Controller
         $vesselCabin->fill($validatedData);
         $vesselCabin->save();
 
-        return ApiResponse::success($vesselCabin, 'The cabin was updated');
+        return ApiResponse::success(
+            $vesselCabin->toArray(), 'The cabin has been updated'
+        );
     }
 }

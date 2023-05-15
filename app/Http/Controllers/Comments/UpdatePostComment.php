@@ -34,6 +34,8 @@ class UpdatePostComment extends Controller
 
         $comment->update($validatedData->validated());
 
-        return ApiResponse::success($comment, 'Comment updated successfully');
+        return ApiResponse::success(
+            $comment->toArray(), 'Comment updated successfully'
+        );
     }
 }

@@ -25,6 +25,6 @@ class DeleteCrewCabin extends Controller
 
         $crewCabin->delete();
 
-        return ApiResponse::success($crewCabin, 'Cabin deleted successfully');
+        return ApiResponse::success('Cabin deleted successfully');
     }
 }

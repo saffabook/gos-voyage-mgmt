@@ -27,6 +27,6 @@ class DeleteVesselCabin extends Controller
         $vesselCabin->delete();
         VesselCabinAdditionals::where('cabin_id', $id)->delete();
 
-        return ApiResponse::success($vesselCabin, 'Cabin deleted successfully');
+        return ApiResponse::success('Cabin deleted successfully');
     }
 }
