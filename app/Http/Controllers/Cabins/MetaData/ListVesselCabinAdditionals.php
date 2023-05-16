@@ -23,6 +23,6 @@ class ListVesselCabinAdditionals extends Controller
           return ApiResponse::error('No cabin information found');
         }
 
-        return ApiResponse::success($vesselCabinAdditionalsFromDb);
+        return ApiResponse::success($vesselCabinAdditionalsFromDb->toArray());
     }
 }

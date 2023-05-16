@@ -23,6 +23,6 @@ class GetPostComment extends Controller
             return ApiResponse::error('Comment not found');
         }
 
-        return ApiResponse::success($comment);
+        return ApiResponse::success($comment->toArray());
     }
 }

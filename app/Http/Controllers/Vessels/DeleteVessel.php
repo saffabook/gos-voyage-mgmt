@@ -33,6 +33,6 @@ class DeleteVessel extends Controller
         }
         $vessel->delete();
 
-        return ApiResponse::success($vessel, 'Vessel deleted successfully');
+        return ApiResponse::success('Vessel deleted successfully');
     }
 }

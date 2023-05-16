@@ -21,7 +21,6 @@ class CreateVesselVoyage extends Controller
      */
     public function __invoke(Request $request)
     {
-        $companyId = 0;
 
         $validatedData = Validator::make($request->all(), [
             'title'              => 'required|string|unique:vessel_voyages|max:255',
@@ -45,7 +44,7 @@ class CreateVesselVoyage extends Controller
             return ApiResponse::error($validatedData->messages());
         }
 
-        $vessel = Vessel::where('company_id', $companyId)
+        $vessel = Vessel::where('companyId', $request->input('companyId'))
                         ->find($request->input('vesselId'));
 
         if (!$vessel) {
@@ -54,19 +53,26 @@ class CreateVesselVoyage extends Controller
 
         $validatedData = $validatedData->validated();
 
-        $vesselIsBooked = VesselVoyage::where('vesselId', $validatedData['vesselId'])
-            ->whereDate('startDate', '<=', $validatedData['endDate'])
-            ->whereDate('endDate', '>=', $validatedData['startDate'])
-            ->exists();
+        $validatedData['companyId'] = $request->input('companyId');
+
+        $vesselIsBooked = VesselVoyage::where(
+            'vesselId', $validatedData['vesselId']
+        )->whereDate('startDate', '<=', $validatedData['endDate'])
+         ->whereDate('endDate', '>=', $validatedData['startDate'])
+         ->exists();
 
         if (!empty($vesselIsBooked)) {
             return ApiResponse::error('The vessel is already booked for this time');
         }
 
-        $validatedData['voyageReferenceNumber'] = GenerateVoyageId::execute($companyId);
+        $validatedData['voyageReferenceNumber'] = GenerateVoyageId::execute(
+            $request->input('companyId')
+        );
 
         $voyage = VesselVoyage::create($validatedData);
 
-        return ApiResponse::success($voyage, 'The voyage was created');
+        return ApiResponse::success(
+            $voyage->toArray(), 'The voyage was created'
+        );
     }
 }

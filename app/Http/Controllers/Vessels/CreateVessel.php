@@ -19,12 +19,12 @@ class CreateVessel extends Controller
     public function __invoke(Request $request)
     {
         $validatedData = Validator::make($request->all(), [
-            'name' => 'required|string|unique:vessels|max:30',
-            'vessel_type' => 'string|max:30',
-            'year_built' => 'nullable|date_format:Y-m-d',
+            'name'           => 'required|string|unique:vessels|max:30',
+            'vessel_type'    => 'string|max:30',
+            'year_built'     => 'nullable|date_format:Y-m-d',
             'length_overall' => 'integer',
             'length_on_deck' => 'integer',
-            'description' => 'string|between:30,600'
+            'description'    => 'string|between:30,600'
         ], [
             'name.unique' => 'A vessel with that name already exists.'
         ]);
@@ -33,8 +33,14 @@ class CreateVessel extends Controller
             return ApiResponse::error($validatedData->messages());
         }
 
-        $vessel = Vessel::create($validatedData->validated());
+        $validatedData = $validatedData->validated();
 
-        return ApiResponse::success($vessel, 'The vessel was created');
+        $validatedData['companyId'] = $request->input('companyId');
+
+        $vessel = Vessel::create($validatedData);
+
+        return ApiResponse::success(
+            $vessel->toArray(), 'The vessel was created'
+        );
     }
 }

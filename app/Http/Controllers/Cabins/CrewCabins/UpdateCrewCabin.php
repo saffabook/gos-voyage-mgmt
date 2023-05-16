@@ -45,6 +45,8 @@ class UpdateCrewCabin extends Controller
         $crewCabin->fill($validatedData);
         $crewCabin->save();
 
-        return ApiResponse::success($crewCabin, 'The cabin was updated');
+        return ApiResponse::success(
+            $crewCabin->toArray(), 'The cabin has been updated'
+        );
     }
 }

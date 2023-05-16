@@ -23,6 +23,6 @@ class GetPosts extends Controller
           return ApiResponse::error('No posts found');
         }
 
-        return ApiResponse::success($postsFromDb);
+        return ApiResponse::success($postsFromDb->toArray());
     }
 }

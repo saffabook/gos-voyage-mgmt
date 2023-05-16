@@ -23,6 +23,6 @@ class ListCrewCabins extends Controller
           return ApiResponse::error('No cabins found');
         }
 
-        return ApiResponse::success($crewCabinsFromDb);
+        return ApiResponse::success($crewCabinsFromDb->toArray());
     }
 }

@@ -29,6 +29,8 @@ class AddPostComment extends Controller
 
         $comment = PostComment::create($validatedData->validated());
 
-        return ApiResponse::success($comment, 'The comment was added');
+        return ApiResponse::success(
+            $comment->toArray(), 'The comment was added'
+        );
     }
 }
