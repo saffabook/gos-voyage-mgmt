@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\VoyagePort;
 use App\Helpers\ApiResponse;
 use App\Models\VesselVoyage;
-use Carbon\Carbon;
 
 class DeleteVoyagePort extends Controller
 {
@@ -27,38 +26,36 @@ class DeleteVoyagePort extends Controller
             return ApiResponse::error('Port not found');
         }
 
-        if (!$request->input('forceAction')) {
-            $today = Carbon::now();
+        $voyagesWithActivePort = VesselVoyage::where('embarkPortId', $portId)
+                                             ->orWhere('disembarkPortId', $portId)
+                                             ->get();
 
-            $portIsActive = VesselVoyage::where('embarkPortId', $portId)
-                                        ->orWhere('disembarkPortId', $portId)
-                                        ->whereDate('startDate', '<=', $today)
-                                        ->whereDate('endDate', '>=', $today)
-                                        ->exists();
-
-            if (!empty($portIsActive)) {
-                return ApiResponse::error(
-                    'Cannot delete. Port is in use.'
-                );
-            }
+        if (!empty($voyagesWithActivePort->toArray()) && !$request->input('forceAction')) {
+            return ApiResponse::error(
+                'Cannot delete. Port is in use.'
+            );
         }
 
         $port->delete();
 
-        $voyagesWithDeletedPort = VesselVoyage::where('embarkPortId', $portId)
-                                              ->orWhere('disembarkPortId', $portId)
-                                              ->get();
+        if (!empty($voyagesWithActivePort)) {
+            foreach ($voyagesWithActivePort as $voyage) {
 
-        foreach ($voyagesWithDeletedPort as $voyage) {
+                $isUpdated = false;
 
-            if ($voyage->embarkPortId == $portId) {
-                $voyage->embarkPortId = null;
-                $voyage->save();
-            }
+                if ($voyage->embarkPortId == $portId) {
+                    $voyage->embarkPortId = null;
+                    $isUpdated = true;
+                }
 
-            if ($voyage->disembarkPortId == $portId) {
-                $voyage->disembarkPortId = null;
-                $voyage->save();
+                if ($voyage->disembarkPortId == $portId) {
+                    $voyage->disembarkPortId = null;
+                    $isUpdated = true;
+                }
+
+                if ($isUpdated) {
+                    $voyage->save();
+                }
             }
         }
 

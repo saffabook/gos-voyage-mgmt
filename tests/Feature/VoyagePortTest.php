@@ -346,10 +346,10 @@ class VoyagePortTest extends TestCase
             'description'           => 'Description for TestVoyage.',
             'vesselId'              => $vessel->id,
             'voyageType'            => 'ROUNDTRIP',
-            'embarkPortId'          => $port1->id,
+            'embarkPortId'          => 98,
             'startDate'             => $today->addDays(2)->toDateString(),
             'startTime'             => '11:50',
-            'disembarkPortId'       => $port2->id,
+            'disembarkPortId'       => 99,
             'endDate'               => $today->addDays(12)->toDateString(),
             'endTime'               => '16:30',
             'companyId'             => $request['companyId'],
@@ -414,8 +414,7 @@ class VoyagePortTest extends TestCase
         $vessel  = Vessel::factory()->create(['companyId' => '1']);
         $port1   = VoyagePort::factory()->create(['companyId' => '1']);
         $port2   = VoyagePort::factory()->create(['companyId' => '1']);
-        // $today   = Carbon::now();
-        // $request = ['companyId' => '1'];
+        $today   = Carbon::now();
         $request = [
             'companyId'   => '1',
             'forceAction' => '1'
@@ -427,11 +426,11 @@ class VoyagePortTest extends TestCase
             'vesselId'              => $vessel->id,
             'voyageType'            => 'ROUNDTRIP',
             'embarkPortId'          => $port1->id,
-            // 'startDate'             => $today->addDays(22)->toDateString(),
+            'startDate'             => $today->addDays(22)->toDateString(),
             'startDate'             => '2023-05-20',
             'startTime'             => '11:50',
             'disembarkPortId'       => $port2->id,
-            // 'endDate'               => $today->addDays(24)->toDateString(),
+            'endDate'               => $today->addDays(24)->toDateString(),
             'endDate'               => '2023-05-22',
             'endTime'               => '16:30',
             'companyId'             => $request['companyId'],
@@ -441,19 +440,18 @@ class VoyagePortTest extends TestCase
         ]);
 
         $jsonResponse = $this->postJson(
-            // '/api/ports/delete/'.$port2->id, $request
-            '/api/ports/delete/'.$testVoyage->embarkPortId, $request
+            '/api/ports/delete/'.$testVoyage->disembarkPortId, $request
         );
-
-        var_dump($jsonResponse);
 
         $jsonResponse->assertStatus(200)
             ->assertJsonPath('data.message', 'Port deleted successfully');
 
+        $this->assertDatabaseMissing('voyage_ports', $port2->toArray());
+
         $this->assertDatabaseHas('vessel_voyages', [
-            'id' => $testVoyage->id,
-            'embarkPortId' => null,
-            'disembarkPortId' => $testVoyage->disembarkPortId
+            'id'              => $testVoyage->id,
+            'embarkPortId'    => $port1->id,
+            'disembarkPortId' => null
         ]);
     }
 }
