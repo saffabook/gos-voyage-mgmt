@@ -22,10 +22,10 @@ class CreateVesselVoyages extends Migration
             $table->enum('voyageType', ['ROUNDTRIP', 'ONEWAY', 'DAYTRIP']);
             $table->string('voyageReferenceNumber');
             $table->boolean('isPassportRequired')->default(1);
-            $table->integer('embarkPortId');
+            $table->integer('embarkPortId')->nullable();
             $table->date('startDate');
             $table->time('startTime');
-            $table->integer('disembarkPortId');
+            $table->integer('disembarkPortId')->nullable();
             $table->date('endDate');
             $table->time('endTime');
             $table->integer('companyId');

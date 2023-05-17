@@ -45,6 +45,23 @@ class DeleteVoyagePort extends Controller
 
         $port->delete();
 
+        $voyagesWithDeletedPort = VesselVoyage::where('embarkPortId', $portId)
+                                              ->orWhere('disembarkPortId', $portId)
+                                              ->get();
+
+        foreach ($voyagesWithDeletedPort as $voyage) {
+
+            if ($voyage->embarkPortId == $portId) {
+                $voyage->embarkPortId = null;
+                $voyage->save();
+            }
+
+            if ($voyage->disembarkPortId == $portId) {
+                $voyage->disembarkPortId = null;
+                $voyage->save();
+            }
+        }
+
         return ApiResponse::success('Port deleted successfully');
     }
 }

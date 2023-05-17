@@ -408,4 +408,52 @@ class VoyagePortTest extends TestCase
         $this->assertDatabaseMissing('voyage_ports', $port1->toArray())
              ->assertDatabaseCount('voyage_ports', 1);
     }
+
+    public function testVoyageWithDeletedPortIsNull()
+    {
+        $vessel  = Vessel::factory()->create(['companyId' => '1']);
+        $port1   = VoyagePort::factory()->create(['companyId' => '1']);
+        $port2   = VoyagePort::factory()->create(['companyId' => '1']);
+        // $today   = Carbon::now();
+        // $request = ['companyId' => '1'];
+        $request = [
+            'companyId'   => '1',
+            'forceAction' => '1'
+        ];
+
+        $testVoyage = VesselVoyage::create([
+            'title'                 => 'Test Voyage',
+            'description'           => 'Description for TestVoyage.',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $port1->id,
+            // 'startDate'             => $today->addDays(22)->toDateString(),
+            'startDate'             => '2023-05-20',
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $port2->id,
+            // 'endDate'               => $today->addDays(24)->toDateString(),
+            'endDate'               => '2023-05-22',
+            'endTime'               => '16:30',
+            'companyId'             => $request['companyId'],
+            'voyageReferenceNumber' => GenerateVoyageId::execute(
+                $request['companyId']
+            )
+        ]);
+
+        $jsonResponse = $this->postJson(
+            // '/api/ports/delete/'.$port2->id, $request
+            '/api/ports/delete/'.$testVoyage->embarkPortId, $request
+        );
+
+        var_dump($jsonResponse);
+
+        $jsonResponse->assertStatus(200)
+            ->assertJsonPath('data.message', 'Port deleted successfully');
+
+        $this->assertDatabaseHas('vessel_voyages', [
+            'id' => $testVoyage->id,
+            'embarkPortId' => null,
+            'disembarkPortId' => $testVoyage->disembarkPortId
+        ]);
+    }
 }
