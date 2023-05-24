@@ -454,4 +454,52 @@ class VoyagePortTest extends TestCase
             'disembarkPortId' => null
         ]);
     }
+
+    public function testUserCannotForceDeletePortWhenForceActionIsNotTrue()
+    {
+        $vessel  = Vessel::factory()->create(['companyId' => '1']);
+        $port1   = VoyagePort::factory()->create(['companyId' => '1']);
+        $port2   = VoyagePort::factory()->create(['companyId' => '1']);
+        $today   = Carbon::now();
+        $request = [
+            'companyId'   => '1',
+            'forceAction' => '0'
+        ];
+
+        $testVoyage = VesselVoyage::create([
+            'title'                 => 'Test Voyage',
+            'description'           => 'Description for TestVoyage.',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $port1->id,
+            'startDate'             => $today->addDays(22)->toDateString(),
+            'startDate'             => '2023-05-20',
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $port2->id,
+            'endDate'               => $today->addDays(24)->toDateString(),
+            'endDate'               => '2023-05-22',
+            'endTime'               => '16:30',
+            'companyId'             => $request['companyId'],
+            'voyageReferenceNumber' => GenerateVoyageId::execute(
+                $request['companyId']
+            )
+        ]);
+
+        $jsonResponse = $this->postJson(
+            '/api/ports/delete/'.$testVoyage->disembarkPortId, $request
+        );
+
+        if (isset($jsonResponse['error'])) {
+            $jsonResponse->assertStatus(422);
+
+            $this->assertSame(
+                $jsonResponse['error']['forceAction'][0],
+                'forceAction can only be true'
+            );
+        }
+
+        $this->assertDatabaseHas('voyage_ports', [
+            'id' => $testVoyage->disembarkPortId
+        ]);
+    }
 }
