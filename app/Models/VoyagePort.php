@@ -18,4 +18,24 @@ class VoyagePort extends Model
         'addressId',
         'companyId'
     ];
+
+    /**
+     * Get all of the voyageEmbarkPorts for the VesselVoyage
+     *
+     * @return HasMany
+     */
+    public function voyageEmbarkPorts()
+    {
+        return $this->hasMany(VesselVoyage::class, 'embarkPortId');
+    }
+
+    /**
+     * Get all of the voyageDisembarkPorts for the VesselVoyage
+     *
+     * @return HasMany
+     */
+    public function voyageDisembarkPorts()
+    {
+        return $this->hasMany(VesselVoyage::class, 'disembarkPortId');
+    }
 }
