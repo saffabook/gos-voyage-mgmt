@@ -17,10 +17,9 @@ class UpdateVoyagePort extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke(Request $request)
+    public function __invoke($portId, Request $request)
     {
         $validatedData = Validator::make($request->all(), [
-            'id'    => 'required|integer|exists:voyage_ports,id',
             'title' => [
                 'required',
                 'string',
@@ -30,24 +29,34 @@ class UpdateVoyagePort extends Controller
                     ->ignore($request->id)
             ],
             'description' => 'string|between:30,600',
-            'directions'  => 'string|max:255'
+            'directions'  => 'string|max:255',
+            'forceAction' => 'sometimes|in:1,true',
         ], [
-            'title.unique' => 'You have already created a port with that name.'
+            'title.unique'   => 'You have already created a port with that name.',
+            'forceAction.in' => 'forceAction can only be true'
         ]);
 
         if ($validatedData->fails()) {
             return ApiResponse::error($validatedData->messages());
         }
 
-        $port = VoyagePort::where('companyId', $request->input('companyId'))
-                          ->find($request->input('id'));
+        $validatedData = $validatedData->validated();
+
+        $port = VoyagePort::where('companyId', $request->companyId)
+                          ->with('voyageEmbarkPorts', 'voyageDisembarkPorts')
+                          ->find($portId);
 
         if (empty($port)) {
             return ApiResponse::error('Port not found.');
         }
 
-        $port->fill($validatedData->validated());
+        if (!isset($validatedData['forceAction']) || !$validatedData['forceAction']) {
+            if (!$port->voyageEmbarkPorts->isEmpty() || !$port->voyageDisembarkPorts->isEmpty()) {
+                return ApiResponse::error('Cannot update. Port is in use.');
+            }
+        }
 
+        $port->fill($validatedData);
         $port->save();
 
         return ApiResponse::success(
