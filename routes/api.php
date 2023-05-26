@@ -69,15 +69,15 @@ Route::group([
 Route::group([
     'prefix' => 'cabin-additionals'
     ], function () {
-    Route::post('create', 
+    Route::post('create',
         Controllers\Cabins\MetaData\CreateVesselCabinAdditionals::class);
-    Route::post('/', 
+    Route::post('/',
         Controllers\Cabins\MetaData\ListVesselCabinAdditionals::class);
-    Route::post('get/{id}', 
+    Route::post('get/{id}',
         Controllers\Cabins\MetaData\GetVesselCabinAdditionals::class);
-    Route::post('update', 
+    Route::post('update',
         Controllers\Cabins\MetaData\UpdateVesselCabinAdditionals::class);
-    Route::post('delete/{id}', 
+    Route::post('delete/{id}',
         Controllers\Cabins\MetaData\DeleteVesselCabinAdditionals::class);
 });
 
@@ -93,6 +93,6 @@ Route::group([
     ], function () {
     Route::post('create', Controllers\Voyages\CreateVoyagePort::class);
     Route::post('get/{id}', Controllers\Voyages\GetVoyagePort::class);
-    Route::post('update', Controllers\Voyages\UpdateVoyagePort::class);
+    Route::post('update/{id}', Controllers\Voyages\UpdateVoyagePort::class);
     Route::post('delete/{id}', Controllers\Voyages\DeleteVoyagePort::class);
 });

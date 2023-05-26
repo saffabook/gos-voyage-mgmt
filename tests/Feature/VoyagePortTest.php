@@ -167,12 +167,11 @@ class VoyagePortTest extends TestCase
         ]);
 
         $request = [
-            'id'        => $companyOnePort->id,
             'companyId' => $companyOnePort->companyId,
             'title'     => 'Edited Title'
         ];
 
-        $jsonResponse = $this->postJson('/api/ports/update', $request);
+        $jsonResponse = $this->postJson('/api/ports/update/'.$companyOnePort->id, $request);
 
         $jsonResponse->assertStatus(200)
             ->assertJson([
@@ -191,12 +190,11 @@ class VoyagePortTest extends TestCase
         ]);
 
         $request = [
-            'id'        => '2',
             'companyId' => '1',
             'title'     => $existingPort->title
         ];
 
-        $jsonResponse = $this->postJson('/api/ports/update', $request);
+        $jsonResponse = $this->postJson('/api/ports/update/2', $request);
 
         $jsonResponse->assertStatus(422);
 
@@ -214,12 +212,11 @@ class VoyagePortTest extends TestCase
         ]);
 
         $request = [
-            'id'        => $companyOnePort->id,
             'companyId' => '2',
             'title'     => 'Porvoo'
         ];
 
-        $jsonResponse = $this->postJson('/api/ports/update', $request);
+        $jsonResponse = $this->postJson('/api/ports/update/'.$companyOnePort->id, $request);
 
         $jsonResponse->assertStatus(422)
             ->assertJson([
@@ -234,14 +231,13 @@ class VoyagePortTest extends TestCase
         ]);
 
         $request = [
-            'id'          => $companyOnePort->id,
             'companyId'   => $companyOnePort->companyId,
             'title'       => $companyOnePort->title,
             'description' => 'Edited port description for testing purposes.',
             'directions'  => 'Edited directions.'
         ];
 
-        $jsonResponse = $this->postJson('/api/ports/update', $request);
+        $jsonResponse = $this->postJson('/api/ports/update/'.$companyOnePort->id, $request);
 
         $jsonResponse->assertStatus(200)
             ->assertJson([
@@ -500,6 +496,83 @@ class VoyagePortTest extends TestCase
 
         $this->assertDatabaseHas('voyage_ports', [
             'id' => $testVoyage->disembarkPortId
+        ]);
+    }
+
+    public function testUserCannotUpdateActivePort()
+    {
+        $vessel = Vessel::factory()->create(['companyId' => '1']);
+        $port1  = VoyagePort::factory()->create(['companyId' => '1']);
+        $port2  = VoyagePort::factory()->create(['companyId' => '1']);
+        $today  = Carbon::now();
+
+        $request = [
+            'companyId' => '1',
+            'title'     => 'Edited Title'
+        ];
+
+        VesselVoyage::create([
+            'title'                 => 'Test Voyage',
+            'description'           => 'Description for TestVoyage.',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $port1->id,
+            'startDate'             => $today->subDay()->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $port2->id,
+            'endDate'               => $today->addDay()->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $request['companyId'],
+            'voyageReferenceNumber' => GenerateVoyageId::execute(
+                $request['companyId']
+            )
+        ]);
+
+        $jsonResponse = $this->postJson('/api/ports/update/'.$port1->id, $request);
+
+        $jsonResponse->assertStatus(422)
+            ->assertJson(['error' => 'Cannot update. Port is in use.']);
+
+        $this->assertDatabaseHas('voyage_ports', ['id' => $port1->id]);
+    }
+
+    public function testUserCanForceUpdateActivePort()
+    {
+        $vessel = Vessel::factory()->create(['companyId' => '1']);
+        $port1  = VoyagePort::factory()->create(['companyId' => '1']);
+        $port2  = VoyagePort::factory()->create(['companyId' => '1']);
+        $today  = Carbon::now();
+
+        $request = [
+            'companyId'   => '1',
+            'title'       => 'Updated Title',
+            'forceAction' => '1'
+        ];
+
+        VesselVoyage::create([
+            'title'                 => 'Test Voyage',
+            'description'           => 'Description for TestVoyage.',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $port1->id,
+            'startDate'             => $today->subDay()->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $port2->id,
+            'endDate'               => $today->addDay()->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $request['companyId'],
+            'voyageReferenceNumber' => GenerateVoyageId::execute(
+                $request['companyId']
+            )
+        ]);
+
+        $jsonResponse = $this->postJson('/api/ports/update/'.$port1->id, $request);
+
+        $jsonResponse->assertStatus(200)
+            ->assertJsonPath('data.message', 'The port has been updated.');
+
+        $this->assertDatabaseHas('voyage_ports', [
+            'title' => $request['title'],
         ]);
     }
 }
