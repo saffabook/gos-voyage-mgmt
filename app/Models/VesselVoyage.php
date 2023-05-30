@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class VesselVoyage extends Model
@@ -47,5 +48,15 @@ class VesselVoyage extends Model
     public function disembarkPort(): HasOne
     {
         return $this->hasOne(VoyagePort::class, 'id', 'disembarkPortId');
+    }
+
+    /**
+     * Get all of the voyageCabinPrices for the VesselVoyage
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function voyageCabinPrices(): HasMany
+    {
+        return $this->hasMany(VoyageCabinPrice::class, 'voyageId');
     }
 }

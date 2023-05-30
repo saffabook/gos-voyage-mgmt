@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class VesselCabin extends Model
 {
@@ -37,5 +38,15 @@ class VesselCabin extends Model
     public function additionals()
     {
         return $this->hasMany(VesselCabinAdditionals::class, 'cabin_id');
+    }
+
+    /**
+     * Get the price associated with the VesselCabin
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function price(): HasOne
+    {
+        return $this->hasOne(VoyageCabinPrice::class, 'cabinId');
     }
 }

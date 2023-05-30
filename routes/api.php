@@ -69,15 +69,15 @@ Route::group([
 Route::group([
     'prefix' => 'cabin-additionals'
     ], function () {
-    Route::post('create', 
+    Route::post('create',
         Controllers\Cabins\MetaData\CreateVesselCabinAdditionals::class);
-    Route::post('/', 
+    Route::post('/',
         Controllers\Cabins\MetaData\ListVesselCabinAdditionals::class);
-    Route::post('get/{id}', 
+    Route::post('get/{id}',
         Controllers\Cabins\MetaData\GetVesselCabinAdditionals::class);
-    Route::post('update', 
+    Route::post('update',
         Controllers\Cabins\MetaData\UpdateVesselCabinAdditionals::class);
-    Route::post('delete/{id}', 
+    Route::post('delete/{id}',
         Controllers\Cabins\MetaData\DeleteVesselCabinAdditionals::class);
 });
 
@@ -92,4 +92,14 @@ Route::group([
     'prefix' => 'ports'
     ], function () {
     Route::post('create', Controllers\Voyages\CreateVoyagePort::class);
+});
+
+Route::group([
+    'prefix' => 'prices'
+    ], function () {
+    Route::post('create', Controllers\Prices\CreateVoyageCabinPrice::class);
+    Route::post('/', Controllers\Prices\ListVoyageCabinPrices::class);
+    Route::post('get/{id}', Controllers\Prices\GetVoyageCabinPrice::class);
+    Route::post('update/{id}', Controllers\Prices\UpdateVoyageCabinPrice::class);
+    Route::post('delete/{id}', Controllers\Prices\DeleteVoyageCabinPrice::class);
 });
