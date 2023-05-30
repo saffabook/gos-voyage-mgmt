@@ -14,10 +14,11 @@ class CreateVesselVoyageTest extends TestCase
 
     public function testCreateVoyageSuccessful()
     {
-        $embarkPort    = VoyagePort::factory()->create();
-        $disembarkPort = VoyagePort::factory()->create();
-        $vessel        = Vessel::factory()->create();
+        $embarkPort    = VoyagePort::factory()->create(['companyId' => '1']);
+        $disembarkPort = VoyagePort::factory()->create(['companyId' => '1']);
+        $vessel        = Vessel::factory()->create(['companyId' => '1']);
         $date          = Carbon::now();
+        $request       = ['companyId' => '1'];
 
         $voyage = [
             'title'           => 'DateCheckerVoyage',
@@ -30,6 +31,7 @@ class CreateVesselVoyageTest extends TestCase
             'disembarkPortId' => $disembarkPort->id,
             'endDate'         => $date->addDays(10)->toDateString(),
             'endTime'         => '16:30',
+            'companyId'       => $request['companyId']
         ];
 
         $response = $this->postJson('/api/voyages/create', $voyage);
@@ -45,12 +47,12 @@ class CreateVesselVoyageTest extends TestCase
         $date = Carbon::now();
 
         /**
-         * Test Cases: 
+         * Test Cases:
          * 'Last week' - can we book last week if there were no bookings last week?
          * 'This week' - can we book this week if there are no bookings this week?
          * 'Next week' - can we create booking if start date is within 'This week'?
          * 'Overlap' - can we create booking if start date is within 'This week' and end date is within 'Next week'?
-         * 
+         *
          */
         $testCases = [
             'Last week' => [
@@ -71,9 +73,10 @@ class CreateVesselVoyageTest extends TestCase
             ],
         ];
 
-        $embarkPort    = VoyagePort::factory()->create();
-        $disembarkPort = VoyagePort::factory()->create();
-        $vessel        = Vessel::factory()->create();
+        $embarkPort    = VoyagePort::factory()->create(['companyId' => '1']);
+        $disembarkPort = VoyagePort::factory()->create(['companyId' => '1']);
+        $vessel        = Vessel::factory()->create(['companyId' => '1']);
+        $request       = ['companyId' => '1'];
 
         $defaultData = [
             'title'           => 'DateCheckerVoyage',
@@ -84,6 +87,7 @@ class CreateVesselVoyageTest extends TestCase
             'startTime'       => '11:50',
             'disembarkPortId' => $disembarkPort->id,
             'endTime'         => '16:30',
+            'companyId'       => $request['companyId']
         ];
 
         foreach ($testCases as $testName => $overlapVoyage) {

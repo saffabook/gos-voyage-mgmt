@@ -22,7 +22,7 @@ class CreateVesselsTable extends Migration
             $table->integer('length_overall')->nullable();
             $table->integer('length_on_deck')->nullable();
             $table->longText('description')->nullable();
-            $table->integer('company_id')->default(0);
+            $table->integer('companyId');
         });
     }
 

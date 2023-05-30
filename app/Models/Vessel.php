@@ -11,13 +11,13 @@ class Vessel extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 
-        'vessel_type', 
-        'year_built', 
-        'length_overall', 
-        'length_on_deck', 
-        'description', 
-        'company_id'
+        'name',
+        'vessel_type',
+        'year_built',
+        'length_overall',
+        'length_on_deck',
+        'description',
+        'companyId'
     ];
 
     /**

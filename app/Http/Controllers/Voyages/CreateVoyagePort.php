@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\VoyagePort;
 use App\Helpers\ApiResponse;
+use Illuminate\Validation\Rule;
 
 class CreateVoyagePort extends Controller
 {
@@ -18,12 +19,18 @@ class CreateVoyagePort extends Controller
      */
     public function __invoke(Request $request)
     {
-        $companyId = 0;
-
         $validatedData = Validator::make($request->all(), [
-            'title'       => 'required|string|unique:voyage_ports|max:255',
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('voyage_ports')
+                    ->where('companyId', $request->companyId),
+            ],
             'description' => 'string|between:30,600',
             'directions'  => 'string|max:255'
+        ], [
+            'title.unique' => 'You have already created a port with that name.'
         ]);
 
         if ($validatedData->fails()) {
@@ -32,7 +39,7 @@ class CreateVoyagePort extends Controller
 
         $validatedData = $validatedData->validated();
 
-        $validatedData['companyId'] = $companyId;
+        $validatedData['companyId'] = $request->input('companyId');
 
         // This is dummy data until we create addresses table
         $validatedData['addressId'] = 42;
