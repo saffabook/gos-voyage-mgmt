@@ -16,6 +16,7 @@ class VoyageCabinPrice extends Model
         'currency',
         'priceMinor',
         'discountedPriceMinor',
+        'companyId'
     ];
 
     /**
