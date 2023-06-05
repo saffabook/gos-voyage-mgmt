@@ -19,8 +19,8 @@ class CreateVoyageCabinPrice extends Controller
     public function __invoke(Request $request)
     {
         $validatedData = Validator::make($request->all(), [
-            'cabinId'              => 'required|integer',
-            'voyageId'             => 'required|integer',
+            'cabinId'              => 'required|integer|exists:vessel_cabins,id',
+            'voyageId'             => 'required|integer|exists:vessel_voyages,id',
             'currency'             => 'required|string',
             'priceMinor'           => 'required|integer',
             'discountedPriceMinor' => 'integer'
@@ -31,6 +31,8 @@ class CreateVoyageCabinPrice extends Controller
         }
 
         $validatedData = $validatedData->validated();
+
+        $validatedData['companyId'] = $request->input('companyId');
 
         $price = VoyageCabinPrice::create($validatedData);
 

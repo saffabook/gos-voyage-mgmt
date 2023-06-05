@@ -21,6 +21,7 @@ class CreateVoyageCabinPricesTable extends Migration
             $table->string('currency');
             $table->integer('priceMinor');
             $table->integer('discountedPriceMinor')->nullable();
+            $table->integer('companyId');
         });
     }
 
