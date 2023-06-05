@@ -2,53 +2,31 @@
 
 namespace Tests\Feature;
 
-use App\Helpers\GenerateVoyageId;
-use App\Models\Vessel;
-use App\Models\VesselCabin;
-use App\Models\VesselVoyage;
-use App\Models\VoyagePort;
-use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tests\CommonSetups\Voyages\VoyageTestSetupService;
 
 class VoyageCabinPriceTest extends TestCase
 {
     use RefreshDatabase;
 
     /**
-     * When creating a price, ensure cabin exists.
+     * Confirm cabin price can be created successfully.
      *
      * @return void
      */
     public function testUserCanCreatePriceSuccessfully()
     {
-        $vessel = Vessel::factory()->create(['companyId' => '1']);
-        $cabin  = VesselCabin::factory()->create(['vessel_id' => $vessel->id]);
-        $port1  = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
-        $port2  = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
-        $today  = Carbon::now();
-
-        $voyage = VesselVoyage::create([
-            'title'                 => 'Test Voyage',
-            'description'           => 'Description for TestVoyage.',
-            'vesselId'              => $vessel->id,
-            'voyageType'            => 'ROUNDTRIP',
-            'embarkPortId'          => $port1->id,
-            'startDate'             => $today->subDay()->toDateString(),
-            'startTime'             => '11:50',
-            'disembarkPortId'       => $port2->id,
-            'endDate'               => $today->addDay()->toDateString(),
-            'endTime'               => '16:30',
-            'companyId'             => '1',
-            'voyageReferenceNumber' => GenerateVoyageId::execute($vessel->companyId)
-        ]);
+        $companyId = '1';
+        $testDataVesselCabin = VoyageTestSetupService::createTestDataVesselCabin($companyId);
+        $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $request = [
-            'cabinId'    => $cabin->id,
+            'cabinId'    => $testDataVesselCabin['cabin']->id,
             'voyageId'   => $voyage->id,
             'currency'   => 'EUR',
             'priceMinor' => '11000',
-            'companyId'  => $vessel->companyId
+            'companyId'  => $companyId
         ];
 
         $jsonResponse = $this->postJson('/api/prices/create', $request);
@@ -65,33 +43,15 @@ class VoyageCabinPriceTest extends TestCase
      */
     public function testUserCannotCreatePriceUnlessCabinExists()
     {
-        $vessel = Vessel::factory()->create(['companyId' => '1']);
-        $cabin  = VesselCabin::factory()->create(['vessel_id' => $vessel->id]);
-        $port1  = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
-        $port2  = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
-        $today  = Carbon::now();
-
-        $voyage = VesselVoyage::create([
-            'title'                 => 'Test Voyage',
-            'description'           => 'Description for TestVoyage.',
-            'vesselId'              => $vessel->id,
-            'voyageType'            => 'ROUNDTRIP',
-            'embarkPortId'          => $port1->id,
-            'startDate'             => $today->subDay()->toDateString(),
-            'startTime'             => '11:50',
-            'disembarkPortId'       => $port2->id,
-            'endDate'               => $today->addDay()->toDateString(),
-            'endTime'               => '16:30',
-            'companyId'             => '1',
-            'voyageReferenceNumber' => GenerateVoyageId::execute($vessel->companyId)
-        ]);
+        $companyId = '1';
+        $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $request = [
             'cabinId'    => '99',
             'voyageId'   => $voyage->id,
             'currency'   => 'EUR',
             'priceMinor' => '11000',
-            'companyId'  => $vessel->companyId
+            'companyId'  => $companyId
         ];
 
         $jsonResponse = $this->postJson('/api/prices/create', $request);
@@ -110,33 +70,15 @@ class VoyageCabinPriceTest extends TestCase
      */
     public function testUserCannotCreatePriceUnlessVoyageExists()
     {
-        $vessel = Vessel::factory()->create(['companyId' => '1']);
-        $cabin  = VesselCabin::factory()->create(['vessel_id' => $vessel->id]);
-        $port1  = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
-        $port2  = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
-        $today  = Carbon::now();
-
-        $voyage = VesselVoyage::create([
-            'title'                 => 'Test Voyage',
-            'description'           => 'Description for TestVoyage.',
-            'vesselId'              => $vessel->id,
-            'voyageType'            => 'ROUNDTRIP',
-            'embarkPortId'          => $port1->id,
-            'startDate'             => $today->subDay()->toDateString(),
-            'startTime'             => '11:50',
-            'disembarkPortId'       => $port2->id,
-            'endDate'               => $today->addDay()->toDateString(),
-            'endTime'               => '16:30',
-            'companyId'             => '1',
-            'voyageReferenceNumber' => GenerateVoyageId::execute($vessel->companyId)
-        ]);
+        $companyId = '1';
+        $testDataVesselCabin = VoyageTestSetupService::createTestDataVesselCabin($companyId);
 
         $request = [
-            'cabinId'    => $cabin->id,
+            'cabinId'    => $testDataVesselCabin['cabin']->id,
             'voyageId'   => '99',
             'currency'   => 'EUR',
             'priceMinor' => '11000',
-            'companyId'  => $vessel->companyId
+            'companyId'  => $companyId
         ];
 
         $jsonResponse = $this->postJson('/api/prices/create', $request);
@@ -155,33 +97,16 @@ class VoyageCabinPriceTest extends TestCase
      */
     public function testUserCannotCreatePriceWithoutCorrectPriceMinorValue()
     {
-        $vessel = Vessel::factory()->create(['companyId' => '1']);
-        $cabin  = VesselCabin::factory()->create(['vessel_id' => $vessel->id]);
-        $port1  = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
-        $port2  = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
-        $today  = Carbon::now();
-
-        $voyage = VesselVoyage::create([
-            'title'                 => 'Test Voyage',
-            'description'           => 'Description for TestVoyage.',
-            'vesselId'              => $vessel->id,
-            'voyageType'            => 'ROUNDTRIP',
-            'embarkPortId'          => $port1->id,
-            'startDate'             => $today->subDay()->toDateString(),
-            'startTime'             => '11:50',
-            'disembarkPortId'       => $port2->id,
-            'endDate'               => $today->addDay()->toDateString(),
-            'endTime'               => '16:30',
-            'companyId'             => '1',
-            'voyageReferenceNumber' => GenerateVoyageId::execute($vessel->companyId)
-        ]);
+        $companyId = '1';
+        $testDataVesselCabin = VoyageTestSetupService::createTestDataVesselCabin($companyId);
+        $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $request = [
-            'cabinId'    => $cabin->id,
+            'cabinId'    => $testDataVesselCabin['cabin']->id,
             'voyageId'   => $voyage->id,
             'currency'   => 'EUR',
             'priceMinor' => '110.00',
-            'companyId'  => $vessel->companyId
+            'companyId'  => $companyId
         ];
 
         $jsonResponse = $this->postJson('/api/prices/create', $request);
@@ -200,33 +125,16 @@ class VoyageCabinPriceTest extends TestCase
      */
     public function testUserCannotCreatePriceWithoutCurrency()
     {
-        $vessel = Vessel::factory()->create(['companyId' => '1']);
-        $cabin  = VesselCabin::factory()->create(['vessel_id' => $vessel->id]);
-        $port1  = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
-        $port2  = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
-        $today  = Carbon::now();
-
-        $voyage = VesselVoyage::create([
-            'title'                 => 'Test Voyage',
-            'description'           => 'Description for TestVoyage.',
-            'vesselId'              => $vessel->id,
-            'voyageType'            => 'ROUNDTRIP',
-            'embarkPortId'          => $port1->id,
-            'startDate'             => $today->subDay()->toDateString(),
-            'startTime'             => '11:50',
-            'disembarkPortId'       => $port2->id,
-            'endDate'               => $today->addDay()->toDateString(),
-            'endTime'               => '16:30',
-            'companyId'             => '1',
-            'voyageReferenceNumber' => GenerateVoyageId::execute($vessel->companyId)
-        ]);
+        $companyId = '1';
+        $testDataVesselCabin = VoyageTestSetupService::createTestDataVesselCabin($companyId);
+        $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $request = [
-            'cabinId'    => $cabin->id,
+            'cabinId'    => $testDataVesselCabin['cabin']->id,
             'voyageId'   => $voyage->id,
             'currency'   => '',
             'priceMinor' => '11000',
-            'companyId'  => $vessel->companyId
+            'companyId'  => $companyId
         ];
 
         $jsonResponse = $this->postJson('/api/prices/create', $request);
