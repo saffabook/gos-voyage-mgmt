@@ -441,4 +441,103 @@ class VoyageCabinPriceTest extends TestCase
 
         $this->assertDatabaseMissing('voyage_cabin_prices', $request);
     }
+
+    /**
+     * Ensure the user can only delete their own prices.
+     *
+     * @return void
+     */
+    public function testUserCannotDeleteOtherUsersPrices()
+    {
+        $companyId = '1';
+        $testDataVesselCabin = VoyageTestSetupService::createTestDataVesselCabin($companyId);
+        $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
+
+        $price = VoyageCabinPrice::create([
+            'cabinId'    => $testDataVesselCabin['cabin']->id,
+            'voyageId'   => $voyage->id,
+            'currency'   => 'EUR',
+            'priceMinor' => '11000',
+            'companyId'  => $companyId
+        ]);
+
+        $request = [
+            'companyId' => ''
+        ];
+
+        $jsonResponse = $this->postJson('/api/prices/delete/'.$price->id, $request);
+
+        $jsonResponse->assertStatus(422)
+            ->assertJson(['error' => 'Price not found.']);
+
+        $this->assertDatabaseHas('voyage_cabin_prices', ['id' => $price->id]);
+    }
+
+    /**
+     * Ensure the user can delete price successfully when voyage is not active.
+     *
+     * @return void
+     */
+    public function testUserCanDeleteTheirOwnPriceWhenVoyageIsNotActive()
+    {
+        $companyId = '1';
+        $testDataVesselCabin = VoyageTestSetupService::createTestDataVesselCabin($companyId);
+        $voyage = VoyageTestSetupService::createTestDataVoyageInactive($companyId);
+
+        $price = VoyageCabinPrice::create([
+            'cabinId'    => $testDataVesselCabin['cabin']->id,
+            'voyageId'   => $voyage->id,
+            'currency'   => 'EUR',
+            'priceMinor' => '11000',
+            'companyId'  => $companyId
+
+        ]);
+
+        $request = [
+            'companyId' => $companyId
+        ];
+
+        $jsonResponse = $this->postJson('/api/prices/delete/'.$price->id, $request);
+
+        $jsonResponse->assertStatus(200)
+            ->assertJsonPath('data.message', 'Price deleted successfully');
+
+        $this->assertDatabaseMissing('voyage_cabin_prices', ['id' => $price->id]);
+    }
+
+    /**
+     * If the user attempts to delete a cabin price when the voyage is active,
+     * ensure the response throws an error message suggesting to convert the
+     * voyage to draft or cancelled.
+     *
+     * @return void
+     */
+    public function testUserCannotDeletePriceIfVoyageIsActive()
+    {
+        $companyId = '1';
+        $testDataVesselCabin = VoyageTestSetupService::createTestDataVesselCabin($companyId);
+        $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
+
+        $price = VoyageCabinPrice::create([
+            'cabinId'    => $testDataVesselCabin['cabin']->id,
+            'voyageId'   => $voyage->id,
+            'currency'   => 'EUR',
+            'priceMinor' => '11000',
+            'companyId'  => $companyId
+
+        ]);
+
+        $request = [
+            'companyId' => $companyId,
+        ];
+
+        $jsonResponse = $this->postJson('/api/prices/delete/'.$price->id, $request);
+
+        $jsonResponse->assertStatus(422)
+            ->assertJson([
+                'error' => 'Voyage is active. Convert status to draft or cancelled.'
+            ]);
+
+        $this->assertDatabaseHas('voyage_cabin_prices', ['id' => $price->id]);
+    }
 }
