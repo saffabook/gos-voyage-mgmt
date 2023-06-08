@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Prices;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\VoyageCabinPrice;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class DeleteVoyageCabinPrice extends Controller
@@ -15,12 +16,23 @@ class DeleteVoyageCabinPrice extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke($priceId)
+    public function __invoke($id, Request $request)
     {
-        $price = VoyageCabinPrice::find($priceId);
+        $price = VoyageCabinPrice::where('companyId', $request->companyId)
+                                 ->with('voyage')
+                                 ->find($id);
 
         if (empty($price)) {
             return ApiResponse::error('Price not found.');
+        }
+
+        $voyageIsActive = $price->voyage->voyageStatus === 'ACTIVE'
+                       && $price->voyage->endDate >= Carbon::now();
+
+        if ($voyageIsActive) {
+            return ApiResponse::error(
+                'Voyage is active. Convert status to draft or cancelled.'
+            );
         }
 
         $price->delete();
