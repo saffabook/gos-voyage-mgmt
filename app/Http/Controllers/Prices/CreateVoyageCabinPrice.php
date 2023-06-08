@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\VoyageCabinPrice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class CreateVoyageCabinPrice extends Controller
 {
@@ -19,6 +20,20 @@ class CreateVoyageCabinPrice extends Controller
     public function __invoke(Request $request)
     {
         $validatedData = Validator::make($request->all(), [
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('voyage_cabin_prices')
+                    ->where('cabinId', $request->cabinId)
+            ],
+            'description' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('voyage_cabin_prices')
+                    ->where('cabinId', $request->cabinId)
+            ],
             'cabinId'              => 'required|integer|exists:vessel_cabins,id',
             'voyageId'             => 'required|integer|exists:vessel_voyages,id',
             'currency'             => 'required|string',

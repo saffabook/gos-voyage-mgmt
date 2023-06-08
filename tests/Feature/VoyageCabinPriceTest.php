@@ -23,11 +23,13 @@ class VoyageCabinPriceTest extends TestCase
         $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $request = [
-            'cabinId'    => $testDataVesselCabin['cabin']->id,
-            'voyageId'   => $voyage->id,
-            'currency'   => 'EUR',
-            'priceMinor' => '11000',
-            'companyId'  => $companyId
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
         ];
 
         $jsonResponse = $this->postJson('/api/prices/create', $request);
@@ -48,11 +50,13 @@ class VoyageCabinPriceTest extends TestCase
         $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $request = [
-            'cabinId'    => '99',
-            'voyageId'   => $voyage->id,
-            'currency'   => 'EUR',
-            'priceMinor' => '11000',
-            'companyId'  => $companyId
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => '99',
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
         ];
 
         $jsonResponse = $this->postJson('/api/prices/create', $request);
@@ -75,11 +79,13 @@ class VoyageCabinPriceTest extends TestCase
         $testDataVesselCabin = VoyageTestSetupService::createTestDataVesselCabin($companyId);
 
         $request = [
-            'cabinId'    => $testDataVesselCabin['cabin']->id,
-            'voyageId'   => '99',
-            'currency'   => 'EUR',
-            'priceMinor' => '11000',
-            'companyId'  => $companyId
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => '99',
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
         ];
 
         $jsonResponse = $this->postJson('/api/prices/create', $request);
@@ -103,11 +109,13 @@ class VoyageCabinPriceTest extends TestCase
         $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $request = [
-            'cabinId'    => $testDataVesselCabin['cabin']->id,
-            'voyageId'   => $voyage->id,
-            'currency'   => 'EUR',
-            'priceMinor' => '110.00',
-            'companyId'  => $companyId
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '110.00',
+            'companyId'   => $companyId
         ];
 
         $jsonResponse = $this->postJson('/api/prices/create', $request);
@@ -131,11 +139,13 @@ class VoyageCabinPriceTest extends TestCase
         $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $request = [
-            'cabinId'    => $testDataVesselCabin['cabin']->id,
-            'voyageId'   => $voyage->id,
-            'currency'   => '',
-            'priceMinor' => '11000',
-            'companyId'  => $companyId
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => '',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
         ];
 
         $jsonResponse = $this->postJson('/api/prices/create', $request);
@@ -159,11 +169,13 @@ class VoyageCabinPriceTest extends TestCase
         $voyage = VoyageTestSetupService::createTestDataVoyageInactive($companyId);
 
         $price = VoyageCabinPrice::create([
-            'cabinId'    => $testDataVesselCabin['cabin']->id,
-            'voyageId'   => $voyage->id,
-            'currency'   => 'EUR',
-            'priceMinor' => '11000',
-            'companyId'  => $companyId
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
 
         ]);
 
@@ -193,11 +205,13 @@ class VoyageCabinPriceTest extends TestCase
         $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $price = VoyageCabinPrice::create([
-            'cabinId'    => $testDataVesselCabin['cabin']->id,
-            'voyageId'   => $voyage->id,
-            'currency'   => 'EUR',
-            'priceMinor' => '11000',
-            'companyId'  => $companyId
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
         ]);
 
         $request = [
@@ -226,12 +240,13 @@ class VoyageCabinPriceTest extends TestCase
         $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $price = VoyageCabinPrice::create([
-            'cabinId'    => $cabin['cabin']->id,
-            'voyageId'   => $voyage->id,
-            'currency'   => 'EUR',
-            'priceMinor' => '11000',
-            'companyId'  => $companyId
-
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => $cabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
         ]);
 
         $request = [
@@ -262,11 +277,13 @@ class VoyageCabinPriceTest extends TestCase
         $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $price = VoyageCabinPrice::create([
-            'cabinId'    => $testDataVesselCabin['cabin']->id,
-            'voyageId'   => $voyage->id,
-            'currency'   => 'EUR',
-            'priceMinor' => '11000',
-            'companyId'  => $companyId
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
         ]);
 
         $request = [
@@ -300,12 +317,13 @@ class VoyageCabinPriceTest extends TestCase
         $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $price = VoyageCabinPrice::create([
-            'cabinId'    => $testDataVesselCabin['cabin']->id,
-            'voyageId'   => $voyage->id,
-            'currency'   => 'EUR',
-            'priceMinor' => '11000',
-            'companyId'  => $companyId
-
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
         ]);
 
         $request = [
@@ -341,12 +359,13 @@ class VoyageCabinPriceTest extends TestCase
         $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $price = VoyageCabinPrice::create([
-            'cabinId'    => $testDataVesselCabin['cabin']->id,
-            'voyageId'   => $voyage->id,
-            'currency'   => 'EUR',
-            'priceMinor' => '11000',
-            'companyId'  => $companyId
-
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
         ]);
 
         $request = [
@@ -379,12 +398,13 @@ class VoyageCabinPriceTest extends TestCase
         $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $price = VoyageCabinPrice::create([
-            'cabinId'    => $testDataVesselCabin['cabin']->id,
-            'voyageId'   => $voyage->id,
-            'currency'   => 'EUR',
-            'priceMinor' => '11000',
-            'companyId'  => $companyId
-
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
         ]);
 
         $request = [
@@ -418,12 +438,13 @@ class VoyageCabinPriceTest extends TestCase
         $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $price = VoyageCabinPrice::create([
-            'cabinId'    => $testDataVesselCabin['cabin']->id,
-            'voyageId'   => $voyage->id,
-            'currency'   => 'EUR',
-            'priceMinor' => '11000',
-            'companyId'  => $companyId
-
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
         ]);
 
         $request = [
@@ -454,11 +475,13 @@ class VoyageCabinPriceTest extends TestCase
         $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $price = VoyageCabinPrice::create([
-            'cabinId'    => $testDataVesselCabin['cabin']->id,
-            'voyageId'   => $voyage->id,
-            'currency'   => 'EUR',
-            'priceMinor' => '11000',
-            'companyId'  => $companyId
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
         ]);
 
         $request = [
@@ -485,12 +508,13 @@ class VoyageCabinPriceTest extends TestCase
         $voyage = VoyageTestSetupService::createTestDataVoyageInactive($companyId);
 
         $price = VoyageCabinPrice::create([
-            'cabinId'    => $testDataVesselCabin['cabin']->id,
-            'voyageId'   => $voyage->id,
-            'currency'   => 'EUR',
-            'priceMinor' => '11000',
-            'companyId'  => $companyId
-
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
         ]);
 
         $request = [
@@ -519,12 +543,13 @@ class VoyageCabinPriceTest extends TestCase
         $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
 
         $price = VoyageCabinPrice::create([
-            'cabinId'    => $testDataVesselCabin['cabin']->id,
-            'voyageId'   => $voyage->id,
-            'currency'   => 'EUR',
-            'priceMinor' => '11000',
-            'companyId'  => $companyId
-
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
         ]);
 
         $request = [
@@ -539,5 +564,194 @@ class VoyageCabinPriceTest extends TestCase
             ]);
 
         $this->assertDatabaseHas('voyage_cabin_prices', ['id' => $price->id]);
+    }
+
+    /**
+     * When creating a price, ensure more than one price can be created for a cabin.
+     *
+     * @return void
+     */
+    public function testUserCanCreateMoreThanOnePriceForACabin()
+    {
+        $companyId = '1';
+        $testDataVesselCabin = VoyageTestSetupService::createTestDataVesselCabin($companyId);
+        $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
+
+        $cabinPriceInDb = VoyageCabinPrice::create([
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
+        ]);
+
+        $request = [
+            'title'       => 'children',
+            'description' => 'price for children',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '9900',
+            'companyId'   => $companyId
+        ];
+
+        $jsonResponse = $this->postJson('/api/prices/create', $request);
+        $jsonResponse->assertStatus(200);
+        $jsonResponse->assertJson(['data' => $request]);
+
+        $this->assertDatabaseHas('voyage_cabin_prices', [
+            'title' => $cabinPriceInDb->title,
+            'title' => $request['title']
+        ]);
+    }
+
+    /**
+     * When creating a price, ensure there is a title for the cabin price.
+     *
+     * @return void
+     */
+    public function testUserCannotCreatePriceWithoutTitle()
+    {
+        $companyId = '1';
+        $testDataVesselCabin = VoyageTestSetupService::createTestDataVesselCabin($companyId);
+        $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
+
+        $request = [
+            'description' => 'price for PHP developers',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '9900',
+            'companyId'   => $companyId
+        ];
+
+        $jsonResponse = $this->postJson('/api/prices/create', $request);
+        $jsonResponse->assertStatus(422);
+
+        $this->assertSame(
+            $jsonResponse['error']['title'][0],
+            'The title field is required.'
+        );
+
+        $this->assertDatabaseMissing('voyage_cabin_prices', $request);
+    }
+
+    /**
+     * When creating a price, ensure there is a description for the cabin price.
+     *
+     * @return void
+     */
+    public function testUserCannotCreatePriceWithoutDescription()
+    {
+        $companyId = '1';
+        $testDataVesselCabin = VoyageTestSetupService::createTestDataVesselCabin($companyId);
+        $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
+
+        $request = [
+            'title'      => 'adults',
+            'cabinId'    => $testDataVesselCabin['cabin']->id,
+            'voyageId'   => $voyage->id,
+            'currency'   => 'EUR',
+            'priceMinor' => '9900',
+            'companyId'  => $companyId
+        ];
+
+        $jsonResponse = $this->postJson('/api/prices/create', $request);
+        $jsonResponse->assertStatus(422);
+
+        $this->assertSame(
+            $jsonResponse['error']['description'][0],
+            'The description field is required.'
+        );
+
+        $this->assertDatabaseMissing('voyage_cabin_prices', $request);
+    }
+
+    /**
+     * When creating a price, ensure there cannot be two titles that are
+     * the same for the cabin price.
+     *
+     * @return void
+     */
+    public function testUserCannotCreatePriceWithDuplicateTitle()
+    {
+        $companyId = '1';
+        $testDataVesselCabin = VoyageTestSetupService::createTestDataVesselCabin($companyId);
+        $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
+
+        VoyageCabinPrice::create([
+            'title'       => 'test',
+            'description' => 'price for testing',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
+        ]);
+
+        $request = [
+            'title'       => 'test',
+            'description' => 'another price for testing',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '9900',
+            'companyId'   => $companyId
+        ];
+
+        $jsonResponse = $this->postJson('/api/prices/create', $request);
+        $jsonResponse->assertStatus(422);
+
+        $this->assertSame(
+            $jsonResponse['error']['title'][0],
+            'The title has already been taken.'
+        );
+
+        $this->assertDatabaseMissing('voyage_cabin_prices', $request);
+    }
+
+    /**
+     * When creating a price, ensure there cannot be two descriptions that are
+     * the same for the cabin price.
+     *
+     * @return void
+     */
+    public function testUserCannotCreatePriceWithDuplicateDescription()
+    {
+        $companyId = '1';
+        $testDataVesselCabin = VoyageTestSetupService::createTestDataVesselCabin($companyId);
+        $voyage = VoyageTestSetupService::createTestDataVoyage($companyId);
+
+        VoyageCabinPrice::create([
+            'title'       => 'adults',
+            'description' => 'test',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '11000',
+            'companyId'   => $companyId
+        ]);
+
+        $request = [
+            'title'       => 'children',
+            'description' => 'test',
+            'cabinId'     => $testDataVesselCabin['cabin']->id,
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '9900',
+            'companyId'   => $companyId
+        ];
+
+        $jsonResponse = $this->postJson('/api/prices/create', $request);
+        $jsonResponse->assertStatus(422);
+
+        $this->assertSame(
+            $jsonResponse['error']['description'][0],
+            'The description has already been taken.'
+        );
+
+        $this->assertDatabaseMissing('voyage_cabin_prices', $request);
     }
 }

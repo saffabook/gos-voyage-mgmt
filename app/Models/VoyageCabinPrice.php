@@ -11,6 +11,8 @@ class VoyageCabinPrice extends Model
     use HasFactory;
 
     protected $fillable = [
+        'title',
+        'description',
         'cabinId',
         'voyageId',
         'currency',
