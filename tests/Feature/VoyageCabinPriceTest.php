@@ -462,7 +462,7 @@ class VoyageCabinPriceTest extends TestCase
         ]);
 
         $request = [
-            'companyId' => ''
+            'companyId' => '2'
         ];
 
         $jsonResponse = $this->postJson('/api/prices/delete/'.$price->id, $request);
