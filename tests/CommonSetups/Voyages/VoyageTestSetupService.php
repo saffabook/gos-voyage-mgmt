@@ -6,6 +6,7 @@ use App\Helpers\GenerateVoyageId;
 use App\Models\Vessel;
 use App\Models\VesselCabin;
 use App\Models\VesselVoyage;
+use App\Models\VoyageCabinPrice;
 use App\Models\VoyagePort;
 use Carbon\Carbon;
 
@@ -42,7 +43,7 @@ class VoyageTestSetupService
     }
 
     /**
-     * Function to generate a voyage
+     * Function to generate an active voyage
      *
      * @param int $companyId
      * @param boolean $voyageData
@@ -58,13 +59,42 @@ class VoyageTestSetupService
             'vesselId'              => self::createTestDataVesselCabin($companyId)['vessel']->id,
             'voyageType'            => 'ROUNDTRIP',
             'embarkPortId'          => self::createTestDataPort($companyId)->id,
-            'startDate'             => $today->subDay()->toDateString(),
+            // 'startDate'             => $today->subDays(2)->toDateString(),
+            'startDate'             => $today->copy()->subDays(2)->toDateString(),
             'startTime'             => '11:50',
             'disembarkPortId'       => self::createTestDataPort($companyId)->id,
-            'endDate'               => $today->addDay()->toDateString(),
+            // 'endDate'               => $today->addDays(2)->toDateString(),
+            'endDate'               => $today->copy()->addDays(2)->toDateString(),
             'endTime'               => '16:30',
             'companyId'             => $companyId,
-            'voyageReferenceNumber' => GenerateVoyageId::execute($companyId)
+            'voyageReferenceNumber' => GenerateVoyageId::execute($companyId),
+        ]);
+    }
+
+    /**
+     * Function to generate an inactive voyage
+     *
+     * @param int $companyId
+     * @param boolean $voyageData
+     * @return VesselVoyage
+     */
+    public static function createTestDataVoyageInactive($companyId, $voyageData = false)
+    {
+        $today = Carbon::now();
+
+        return VesselVoyage::create([
+            'title'                 => $voyageData['title'] ?? 'Test Voyage',
+            'description'           => 'Description for TestVoyage.',
+            'vesselId'              => self::createTestDataVesselCabin($companyId)['vessel']->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => self::createTestDataPort($companyId)->id,
+            'startDate'             => $today->copy()->subDays(20)->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => self::createTestDataPort($companyId)->id,
+            'endDate'               => $today->copy()->subDays(10)->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $companyId,
+            'voyageReferenceNumber' => GenerateVoyageId::execute($companyId),
         ]);
     }
 }
