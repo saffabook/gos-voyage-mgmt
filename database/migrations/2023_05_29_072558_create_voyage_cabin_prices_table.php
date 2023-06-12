@@ -17,7 +17,7 @@ class CreateVoyageCabinPricesTable extends Migration
             $table->id();
             $table->timestamps();
             $table->text('title');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->integer('cabinId');
             $table->integer('voyageId');
             $table->string('currency');
