@@ -16,16 +16,16 @@ class CreateVesselCabin extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
-     * 
+     *
      * TODO ensure number of cabins does not exceed vessel capacity
      */
     public function __invoke(Request $request)
     {
         $validatedData = Validator::make($request->all(), [
             'title' => [
-                'required', 
-                'string', 
-                'max:255', 
+                'required',
+                'string',
+                'max:255',
                 Rule::unique('vessel_cabins')
                     ->where('vessel_id', $request->vessel_id),
             ],
@@ -42,7 +42,11 @@ class CreateVesselCabin extends Controller
             return ApiResponse::error($validatedData->messages());
         }
 
-        $cabin = VesselCabin::create($validatedData->validated());
+        $validatedData = $validatedData->validated();
+
+        $validatedData['companyId'] = $request->input('companyId');
+
+        $cabin = VesselCabin::create($validatedData);
 
         return ApiResponse::success($cabin->toArray(), 'The cabin was created');
     }

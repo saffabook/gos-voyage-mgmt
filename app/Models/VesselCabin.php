@@ -17,7 +17,8 @@ class VesselCabin extends Model
         'description',
         'max_occupancy',
         'can_be_booked_single',
-        'vessel_id'
+        'vessel_id',
+        'companyId'
     ];
 
     /**

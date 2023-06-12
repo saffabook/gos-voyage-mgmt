@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Prices;
 
 use App\Helpers\ApiResponse;
+use App\Helpers\CheckSimilarWords;
 use App\Http\Controllers\Controller;
 use App\Models\VesselCabin;
 use App\Models\VesselVoyage;
@@ -22,7 +23,6 @@ class CreateVoyageCabinPrice extends Controller
     public function __invoke(Request $request)
     {
         $validatedData = Validator::make($request->all(), [
-            // 'title'                => 'required|string|max:255',
             'title' => [
                 'required',
                 'string',
@@ -37,41 +37,35 @@ class CreateVoyageCabinPrice extends Controller
             'currency'             => 'required|string',
             'priceMinor'           => 'required|integer',
             'discountedPriceMinor' => 'integer'
+        ], [
+            'title.unique' => "The title '{$request['title']}' for that cabin exists."
         ]);
 
         if ($validatedData->fails()) {
             return ApiResponse::error($validatedData->messages());
         }
 
-        $cabin = VesselCabin::where('id', $request->cabinId)->find();
+        $cabin = VesselCabin::where('id', $request->cabinId)
+                            ->where('companyId', $request->companyId)
+                            ->first();
 
-        if ($cabin->companyId !== $request->companyId) {
+        if (!$cabin) {
             return ApiResponse::error('Cabin not found');
         }
 
         $validatedData = $validatedData->validated();
-
         $validatedData['companyId'] = $request->input('companyId');
 
-        // $cabinId = $validatedData['cabinId'];
+        $cabinsCheckTitle = $cabin->cabinPrices->where('voyageId', $validatedData['voyageId'])->toArray();
+        $titles = collect($cabinsCheckTitle)->pluck('title')->all();
 
-        // $voyageWithCabins = VesselVoyage::with([
-        //     'vesselCabins' => function ($query) use ($cabinId) {
-        //         $query->where('id', $cabinId)->with(['cabinPrices'])->first();
-        //     }
-        // ])->where('companyId', $request->companyId)->find($request->voyageId);
-
-        // TODO: Refactor DB call to get voyage with specific cabin not in array.
-
-        // foreach ($voyageWithCabins->vesselCabins as $cabin) {
-        //     // var_dump($cabin->toArray());
-        //     foreach ($cabin->cabinPrices as $prices) {
-        //         // var_dump($prices->toArray());
-        //         if ($prices->title === $validatedData['title']) {
-        //             return ApiResponse::error('Price title must be unique for cabin and voyage');
-        //         }
-        //     }
-        // }
+        foreach($titles as $title) {
+            if(CheckSimilarWords::execute($title, $validatedData['title'])) {
+                return ApiResponse::error(
+                    "The title '{$validatedData['title']}' is too similar to '{$title}'. Please create a different title."
+                );
+            }
+        }
 
         $price = VoyageCabinPrice::create($validatedData);
 
