@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Prices;
 
 use App\Helpers\ApiResponse;
 use App\Helpers\CheckSimilarWords;
+use App\Helpers\GetCompanyVoyageById;
 use App\Http\Controllers\Controller;
 use App\Models\VesselCabin;
 use App\Models\VesselVoyage;
@@ -67,8 +68,12 @@ class CreateVoyageCabinPrice extends Controller
             }
         }
 
-        $price = VoyageCabinPrice::create($validatedData);
+        return GetCompanyVoyageById::execute(
+            $validatedData['companyId'], $validatedData['voyageId']
+        );
 
-        return ApiResponse::success($price->toArray(), 'The price was created');
+        // $price = VoyageCabinPrice::create($validatedData);
+
+        // return ApiResponse::success($price->toArray(), 'The price was created');
     }
 }
