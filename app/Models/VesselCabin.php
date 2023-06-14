@@ -40,17 +40,10 @@ class VesselCabin extends Model
         return $this->hasMany(VesselCabinAdditionals::class, 'cabin_id');
     }
 
-    /**
-     * Get all of the prices for the VesselCabin
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    // public function cabinPrices()
-    // {
-    //     return $this->hasMany(VoyageCabinPrice::class, 'cabinId');
-    // }
-    public function cabinPrices()
+    public function prices()
     {
         return $this->hasMany(VoyageCabinPrice::class, 'cabinId');
     }
+
+
 }

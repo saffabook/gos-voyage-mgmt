@@ -39,33 +39,32 @@ class CreateVoyageCabinPrice extends Controller
 
         $validatedData = $validatedData->validated();
 
-        // $companyIdFromJwt = 1;
         $validatedData['companyId'] = $request->input('companyId');
 
         $voyage = GetCompanyVoyageById::execute(
-            // $companyIdFromJwt, 1
             $validatedData['companyId'], $validatedData['voyageId']
         );
-
-        var_dump($voyage->vessel->cabins->toArray());
-        exit;
 
         if (is_null($voyage)) {
             return ApiResponse::error('Voyage not found');
         }
 
+
         $cabin = $voyage->vessel->cabins->where('id', $request->cabinId)->first();
 
-        foreach ($cabin->cabinPrices as $prices) {
-            if ($prices->title === $request->title) {
-                return ApiResponse::error(
-                    "The title '{$prices->title}' already exists'. Please create a different title."
-                );
-            }
-            if (CheckSimilarWords::execute($request->title, $prices->title)) {
-                return ApiResponse::error(
-                    "The title '{$prices->title}' is too similar to '{$request->title}'. Please create a different title."
-                );
+
+        if(!empty($cabin->prices)){
+            foreach ($cabin->prices as $prices) {
+                if ($prices->title === $request->title) {
+                    return ApiResponse::error(
+                        "The title '{$prices->title}' already exists'. Please create a different title."
+                    );
+                }
+                if (CheckSimilarWords::execute($request->title, $prices->title)) {
+                    return ApiResponse::error(
+                        "The title '{$prices->title}' is too similar to '{$request->title}'. Please create a different title."
+                    );
+                }
             }
         }
 

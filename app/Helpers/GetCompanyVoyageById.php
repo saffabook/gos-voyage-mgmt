@@ -16,10 +16,9 @@ class GetCompanyVoyageById
     public static function execute($companyId, $voyageId)
     {
 
-        return VesselVoyage::where('companyId', $companyId)
-                                ->with('embarkPort', 'disembarkPort')
-                                ->with('vessel', 'vessel.cabins', 'vessel.cabins.prices')
-                                ->find($voyageId);
+        return VesselVoyage::with(['vessel.cabins.prices' => function ($query) use ($voyageId) {
+            $query->where('voyageId', $voyageId);
+        }])->find($voyageId);
 
     }
 }

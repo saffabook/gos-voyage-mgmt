@@ -40,4 +40,9 @@ class VoyageCabinPrice extends Model
     {
         return $this->belongsTo(VesselVoyage::class, 'voyageId');
     }
+
+    public function cabin()
+    {
+        return $this->belongsTo(VesselCabin::class);
+    }
 }
