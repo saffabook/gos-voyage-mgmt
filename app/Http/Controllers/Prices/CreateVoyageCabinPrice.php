@@ -47,6 +47,9 @@ class CreateVoyageCabinPrice extends Controller
             $validatedData['companyId'], $validatedData['voyageId']
         );
 
+        var_dump($voyage->vessel->cabins->toArray());
+        exit;
+
         if (is_null($voyage)) {
             return ApiResponse::error('Voyage not found');
         }

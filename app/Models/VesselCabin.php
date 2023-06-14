@@ -45,6 +45,10 @@ class VesselCabin extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
+    // public function cabinPrices()
+    // {
+    //     return $this->hasMany(VoyageCabinPrice::class, 'cabinId');
+    // }
     public function cabinPrices()
     {
         return $this->hasMany(VoyageCabinPrice::class, 'cabinId');

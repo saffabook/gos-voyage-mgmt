@@ -26,9 +26,9 @@ class VoyageCabinPrice extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function cabin(): BelongsTo
+    public function prices(): BelongsTo
     {
-        return $this->belongsTo(VesselCabin::class, 'cabinId');
+        return $this->belongsTo(VesselCabin::class);
     }
 
     /**
