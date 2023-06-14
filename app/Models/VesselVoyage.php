@@ -63,10 +63,10 @@ class VesselVoyage extends Model
     // {
     //     return $this->hasOne(VesselCabin::class, 'id', 'cabinId');
     // }
-    // public function vessel(): HasOne
-    // {
-    //     return $this->hasOne(Vessel::class, 'id', 'vesselId');
-    // }
+    public function vessel(): HasOne
+    {
+        return $this->hasOne(Vessel::class, 'id', 'vesselId');
+    }
 
     /**
      * Get all of the voyageCabinPrices for the VesselVoyage

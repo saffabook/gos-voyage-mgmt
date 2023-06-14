@@ -23,14 +23,46 @@ class CreateVoyageCabinPrice extends Controller
      */
     public function __invoke(Request $request)
     {
+
+        $companyIdFromJwt = 1;
+
+        $voyage =  GetCompanyVoyageById::execute(
+            $companyIdFromJwt, 1
+        );
+
+        if(is_null($voyage)){
+            return ApiResponse::error('Voyage not found');
+        }
+        
+        $cabin = $voyage->vessel->cabins->where('id', $request->cabinId)->first();
+
+        foreach($cabin->cabinPrices as $prices){
+            if($prices->title === $request->title){
+                return ApiResponse::error(
+                    "The title '{$prices->title}' already exists'. Please create a different title."
+                );
+            }
+            if(CheckSimilarWords::execute($request->title, $prices->title)){
+                return ApiResponse::error(
+                    "The title '{$prices->title}' is too similar to '{$request->title}'. Please create a different title."
+                );
+            }
+        }  
+
+        
+        // $price = VoyageCabinPrice::create($validatedData);
+
+        //respond success
+
+        var_dump($cabin->toArray());
+
+
+        die();
         $validatedData = Validator::make($request->all(), [
             'title' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('voyage_cabin_prices')
-                    ->where('cabinId', $request->cabinId)
-                    ->where('voyageId', $request->voyageId)
             ],
             'description'          => 'string|max:255',
             'cabinId'              => 'required|integer|exists:vessel_cabins,id',
@@ -68,9 +100,7 @@ class CreateVoyageCabinPrice extends Controller
             }
         }
 
-        $response =  GetCompanyVoyageById::execute(
-            $validatedData['companyId'], $validatedData['voyageId']
-        );
+        
 
         // $price = VoyageCabinPrice::create($validatedData);
 
