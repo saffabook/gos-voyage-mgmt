@@ -23,14 +23,16 @@ class CreateVoyageCabinPrice extends Controller
      */
     public function __invoke(Request $request)
     {
+        // $companyIdFromJwt = 1;
+
         $validatedData = Validator::make($request->all(), [
             'title' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('voyage_cabin_prices')
-                    ->where('cabinId', $request->cabinId)
-                    ->where('voyageId', $request->voyageId)
+                // Rule::unique('voyage_cabin_prices')
+                //     ->where('cabinId', $request->cabinId)
+                //     ->where('voyageId', $request->voyageId)
             ],
             'description'          => 'string|max:255',
             'cabinId'              => 'required|integer|exists:vessel_cabins,id',
@@ -46,33 +48,56 @@ class CreateVoyageCabinPrice extends Controller
             return ApiResponse::error($validatedData->messages());
         }
 
-        $cabin = VesselCabin::where('id', $request->cabinId)
-                            ->where('companyId', $request->companyId)
-                            ->first();
+        // $cabin = VesselCabin::where('id', $request->cabinId)
+        //                     ->where('companyId', $request->companyId)
+        //                     ->first();
 
-        if (!$cabin) {
-            return ApiResponse::error('Cabin not found');
-        }
+        // if (!$cabin) {
+        //     return ApiResponse::error('Cabin not found');
+        // }
 
         $validatedData = $validatedData->validated();
         $validatedData['companyId'] = $request->input('companyId');
 
-        $cabinsCheckTitle = $cabin->cabinPrices->where('voyageId', $validatedData['voyageId'])->toArray();
-        $titles = collect($cabinsCheckTitle)->pluck('title')->all();
+        // $cabinsCheckTitle = $cabin->cabinPrices->where('voyageId', $validatedData['voyageId'])->toArray();
+        // $titles = collect($cabinsCheckTitle)->pluck('title')->all();
 
-        foreach($titles as $title) {
-            if(CheckSimilarWords::execute($title, $validatedData['title'])) {
-                return ApiResponse::error(
-                    "The title '{$validatedData['title']}' is too similar to '{$title}'. Please create a different title."
-                );
-            }
-        }
+        // foreach($titles as $title) {
+        //     if(CheckSimilarWords::execute($title, $validatedData['title'])) {
+        //         return ApiResponse::error(
+        //             "The title '{$validatedData['title']}' is too similar to '{$title}'. Please create a different title."
+        //         );
+        //     }
+        // }
 
-        $response =  GetCompanyVoyageById::execute(
+        // $response =  GetCompanyVoyageById::execute(
+        //     $validatedData['companyId'], $validatedData['voyageId']
+        // );
+
+        // $price = VoyageCabinPrice::create($validatedData);
+
+        $voyage = GetCompanyVoyageById::execute(
             $validatedData['companyId'], $validatedData['voyageId']
         );
 
-        // $price = VoyageCabinPrice::create($validatedData);
+        if(is_null($voyage)){
+            return ApiResponse::error('Voyage not found.');
+        }
+
+        $cabin = $voyage->vessel->cabins->where('id', $request->cabinId)->first();
+
+        foreach($cabin->cabinPrices as $prices){
+            if($prices->title === $request->title){
+                return ApiResponse::error(
+                    "The title '{$prices->title}' already exists'. Please create a different title."
+                );
+            }
+            if(CheckSimilarWords::execute($request->title, $prices->title)){
+                return ApiResponse::error(
+                    "The title '{$prices->title}' is too similar to '{$request->title}'. Please create a different title."
+                );
+            }
+        }
 
         // return ApiResponse::success($price->toArray(), 'The price was created');
         return ApiResponse::success($response);

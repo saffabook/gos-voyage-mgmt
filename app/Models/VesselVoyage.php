@@ -59,14 +59,16 @@ class VesselVoyage extends Model
     {
         return $this->hasMany(VesselCabin::class, 'vessel_id', 'vesselId', );
     }
-    // public function vesselCabin(): HasOne
-    // {
-    //     return $this->hasOne(VesselCabin::class, 'id', 'cabinId');
-    // }
-    // public function vessel(): HasOne
-    // {
-    //     return $this->hasOne(Vessel::class, 'id', 'vesselId');
-    // }
+
+    /**
+     * Get the vessel associated with the VesselVoyage
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function vessel(): HasOne
+    {
+        return $this->hasOne(Vessel::class, 'id', 'vesselId');
+    }
 
     /**
      * Get all of the voyageCabinPrices for the VesselVoyage

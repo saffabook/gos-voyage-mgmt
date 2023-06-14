@@ -21,7 +21,6 @@ class CreateVesselCabinsTable extends Migration
             $table->integer('max_occupancy');
             $table->boolean('can_be_booked_single')->default(1);
             $table->integer('vessel_id');
-            $table->integer('companyId');
         });
     }
 
