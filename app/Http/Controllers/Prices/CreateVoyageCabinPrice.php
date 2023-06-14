@@ -68,12 +68,13 @@ class CreateVoyageCabinPrice extends Controller
             }
         }
 
-        return GetCompanyVoyageById::execute(
+        $response =  GetCompanyVoyageById::execute(
             $validatedData['companyId'], $validatedData['voyageId']
         );
 
         // $price = VoyageCabinPrice::create($validatedData);
 
         // return ApiResponse::success($price->toArray(), 'The price was created');
+        return ApiResponse::success($response);
     }
 }

@@ -12,18 +12,18 @@ class GetCompanyVoyageById
         $responseData = [];
 
         $voyage = VesselVoyage::with('voyageCabinPrices')
-                              ->where('companyId', $companyId)
+                            //   ->where('companyId', $companyId)
                               ->find($voyageId);
 
         $responseData['voyage'] = $voyage;
 
         $vessel = Vessel::with('cabins')
                         ->where('id', $voyage['vesselId'])
-                        ->where('companyId', $voyage['companyId'])
+                        // ->where('companyId', $voyage['companyId'])
                         ->get();
 
         $responseData['vessel'] = $vessel;
 
-        return response()->json(['data' => $responseData]);
+        return $responseData;
     }
 }
