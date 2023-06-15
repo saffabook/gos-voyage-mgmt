@@ -40,4 +40,14 @@ class VoyageCabinPrice extends Model
     {
         return $this->belongsTo(VesselVoyage::class, 'voyageId');
     }
+
+    /**
+     * Get the cabin that owns the VoyageCabinPrice
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function prices(): BelongsTo
+    {
+        return $this->belongsTo(VesselCabin::class);
+    }
 }

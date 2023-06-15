@@ -6,12 +6,13 @@ use App\Helpers\ApiResponse;
 use App\Helpers\CheckSimilarWords;
 use App\Helpers\GetCompanyVoyageById;
 use App\Http\Controllers\Controller;
-use App\Models\VesselCabin;
-use App\Models\VesselVoyage;
+// use App\Models\VesselCabin;
+// use App\Models\VesselVoyage;
 use App\Models\VoyageCabinPrice;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
+// use Illuminate\Validation\Rule;
 
 class CreateVoyageCabinPrice extends Controller
 {
@@ -23,83 +24,63 @@ class CreateVoyageCabinPrice extends Controller
      */
     public function __invoke(Request $request)
     {
-        // $companyIdFromJwt = 1;
-
         $validatedData = Validator::make($request->all(), [
-            'title' => [
-                'required',
-                'string',
-                'max:255',
-                // Rule::unique('voyage_cabin_prices')
-                //     ->where('cabinId', $request->cabinId)
-                //     ->where('voyageId', $request->voyageId)
-            ],
+            'title'                => 'required|string|max:255',
             'description'          => 'string|max:255',
-            'cabinId'              => 'required|integer|exists:vessel_cabins,id',
-            'voyageId'             => 'required|integer|exists:vessel_voyages,id',
+            // 'cabinId'              => 'required|integer|exists:vessel_cabins,id',
+            'cabinId'              => 'required|integer',
+            // 'voyageId'             => 'required|integer|exists:vessel_voyages,id',
+            'voyageId'             => 'required|integer',
             'currency'             => 'required|string',
             'priceMinor'           => 'required|integer',
             'discountedPriceMinor' => 'integer'
-        ], [
-            'title.unique' => "The title '{$request['title']}' for that cabin exists."
         ]);
 
         if ($validatedData->fails()) {
             return ApiResponse::error($validatedData->messages());
         }
 
-        // $cabin = VesselCabin::where('id', $request->cabinId)
-        //                     ->where('companyId', $request->companyId)
-        //                     ->first();
-
-        // if (!$cabin) {
-        //     return ApiResponse::error('Cabin not found');
-        // }
-
         $validatedData = $validatedData->validated();
+
         $validatedData['companyId'] = $request->input('companyId');
-
-        // $cabinsCheckTitle = $cabin->cabinPrices->where('voyageId', $validatedData['voyageId'])->toArray();
-        // $titles = collect($cabinsCheckTitle)->pluck('title')->all();
-
-        // foreach($titles as $title) {
-        //     if(CheckSimilarWords::execute($title, $validatedData['title'])) {
-        //         return ApiResponse::error(
-        //             "The title '{$validatedData['title']}' is too similar to '{$title}'. Please create a different title."
-        //         );
-        //     }
-        // }
-
-        // $response =  GetCompanyVoyageById::execute(
-        //     $validatedData['companyId'], $validatedData['voyageId']
-        // );
-
-        // $price = VoyageCabinPrice::create($validatedData);
 
         $voyage = GetCompanyVoyageById::execute(
             $validatedData['companyId'], $validatedData['voyageId']
         );
 
-        if(is_null($voyage)){
-            return ApiResponse::error('Voyage not found.');
+        if (is_null($voyage)) {
+            return ApiResponse::error('Voyage not found');
+        }
+
+        if ($voyage['endDate'] < Carbon::now()) {
+            return ApiResponse::error(
+                "The voyage '{$voyage['title']}' has expired."
+            );
         }
 
         $cabin = $voyage->vessel->cabins->where('id', $request->cabinId)->first();
 
-        foreach($cabin->cabinPrices as $prices){
-            if($prices->title === $request->title){
-                return ApiResponse::error(
-                    "The title '{$prices->title}' already exists'. Please create a different title."
-                );
-            }
-            if(CheckSimilarWords::execute($request->title, $prices->title)){
-                return ApiResponse::error(
-                    "The title '{$prices->title}' is too similar to '{$request->title}'. Please create a different title."
-                );
+        if (is_null($cabin)) {
+            return ApiResponse::error('Cabin not found');
+        }
+
+        if (!empty($cabin->prices)) {
+            foreach ($cabin->prices as $prices) {
+                if ($prices->title === $request->title) {
+                    return ApiResponse::error(
+                        "The title '{$prices->title}' already exists'. Please create a different title."
+                    );
+                }
+                if (CheckSimilarWords::execute($request->title, $prices->title)) {
+                    return ApiResponse::error(
+                        "The title '{$prices->title}' is too similar to '{$request->title}'. Please create a different title."
+                    );
+                }
             }
         }
 
-        // return ApiResponse::success($price->toArray(), 'The price was created');
-        return ApiResponse::success($response);
+        $price = VoyageCabinPrice::create($validatedData);
+
+        return ApiResponse::success($price->toArray(), 'The price was created');
     }
 }

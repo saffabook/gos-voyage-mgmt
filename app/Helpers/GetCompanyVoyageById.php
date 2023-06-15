@@ -2,26 +2,23 @@
 
 namespace App\Helpers;
 
-use App\Models\Vessel;
 use App\Models\VesselVoyage;
 
-/**
- * Undocumented class
- */
 class GetCompanyVoyageById
 {
     /**
-     * Undocumented function
+     * Function to get voyage with vessel, cabins and cabin prices
      *
-     * @param [type] $companyId
-     * @param [type] $voyageId
-     * @return void
+     * @param int $companyId
+     * @param int $voyageId
+     * @return VesselVoyage
      */
     public static function execute($companyId, $voyageId)
     {
         return VesselVoyage::where('companyId', $companyId)
                            ->with('embarkPort', 'disembarkPort')
-                           ->with('vessel', 'vessel.cabins', 'vessel.cabins.cabinPrices')
-                           ->find($voyageId);
+                           ->with(['vessel.cabins.prices' => function ($query) use ($voyageId) {
+            $query->where('voyageId', $voyageId);
+        }])->find($voyageId);
     }
 }
