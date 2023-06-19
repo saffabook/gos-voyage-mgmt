@@ -42,11 +42,7 @@ class CreateVesselCabin extends Controller
             return ApiResponse::error($validatedData->messages());
         }
 
-        $validatedData = $validatedData->validated();
-
-        $validatedData['companyId'] = $request->input('companyId');
-
-        $cabin = VesselCabin::create($validatedData);
+        $cabin = VesselCabin::create($validatedData->validated());
 
         return ApiResponse::success($cabin->toArray(), 'The cabin was created');
     }
