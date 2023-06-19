@@ -6,13 +6,10 @@ use App\Helpers\ApiResponse;
 use App\Helpers\CheckSimilarWords;
 use App\Helpers\GetCompanyVoyageById;
 use App\Http\Controllers\Controller;
-// use App\Models\VesselCabin;
-// use App\Models\VesselVoyage;
 use App\Models\VoyageCabinPrice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-// use Illuminate\Validation\Rule;
 
 class CreateVoyageCabinPrice extends Controller
 {
@@ -27,9 +24,7 @@ class CreateVoyageCabinPrice extends Controller
         $validatedData = Validator::make($request->all(), [
             'title'                => 'required|string|max:255',
             'description'          => 'string|max:255',
-            // 'cabinId'              => 'required|integer|exists:vessel_cabins,id',
             'cabinId'              => 'required|integer',
-            // 'voyageId'             => 'required|integer|exists:vessel_voyages,id',
             'voyageId'             => 'required|integer',
             'currency'             => 'required|string',
             'priceMinor'           => 'required|integer',
@@ -73,7 +68,7 @@ class CreateVoyageCabinPrice extends Controller
                 }
                 if (CheckSimilarWords::execute($request->title, $prices->title)) {
                     return ApiResponse::error(
-                        "The title '{$prices->title}' is too similar to '{$request->title}'. Please create a different title."
+                        "The title '{$request->title}' is too similar to '{$prices->title}'. Please create a different title."
                     );
                 }
             }
