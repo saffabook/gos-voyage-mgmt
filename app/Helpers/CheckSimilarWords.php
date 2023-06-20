@@ -4,7 +4,7 @@ namespace App\Helpers;
 
 class CheckSimilarWords
 {
-    public static function execute($word1, $word2)
+    public static function execute($word1, $word2, $distanceToCheck = 1)
     {
         // Convert the words to lowercase for case-insensitive comparison
         $word1Lower = strtolower($word1);
@@ -21,8 +21,8 @@ class CheckSimilarWords
         $sortedWord2 = implode('', $sortedWord2);
 
         // Check if the sorted words are equal
-        $distance = levenshtein($sortedWord1, $sortedWord2);
-        if ($sortedWord1 === $sortedWord2 || $distance === 1) {
+        $levenshteinDistance = levenshtein($sortedWord1, $sortedWord2);
+        if ($sortedWord1 === $sortedWord2 || $levenshteinDistance <= $distanceToCheck) {
             return true;
         } else {
             return false;

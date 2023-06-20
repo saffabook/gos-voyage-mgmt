@@ -768,7 +768,7 @@ class VoyageCabinPriceTest extends TestCase
         $cabin  = VesselCabin::factory()->create(['vessel_id' => $voyage['vesselId']]);
 
         $cabinPriceInDb = VoyageCabinPrice::create([
-            'title'       => 'adult',
+            'title'       => 'child',
             'description' => 'price for adult',
             'cabinId'     => $cabin->id,
             'voyageId'    => $voyage->id,
@@ -778,7 +778,7 @@ class VoyageCabinPriceTest extends TestCase
         ]);
 
         $request = [
-            'title'       => 'adults',
+            'title'       => 'children',
             'description' => 'price for adults',
             'cabinId'     => $cabin->id,
             'voyageId'    => $voyage->id,
@@ -790,7 +790,7 @@ class VoyageCabinPriceTest extends TestCase
         $jsonResponse = $this->postJson('/api/prices/create', $request);
 
         $jsonResponse->assertStatus(422)->assertJson([
-            'error' => "The title 'adults' is too similar to 'adult'. Please create a different title."
+            'error' => "The title 'children' is too similar to 'child'. Please create a different title."
         ]);
 
         $this->assertDatabasehas('voyage_cabin_prices', [

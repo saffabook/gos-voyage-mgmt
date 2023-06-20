@@ -66,7 +66,7 @@ class CreateVoyageCabinPrice extends Controller
                         "The title '{$prices->title}' already exists'. Please create a different title."
                     );
                 }
-                if (CheckSimilarWords::execute($request->title, $prices->title)) {
+                if (CheckSimilarWords::execute($request->title, $prices->title, 3)) {
                     return ApiResponse::error(
                         "The title '{$request->title}' is too similar to '{$prices->title}'. Please create a different title."
                     );
