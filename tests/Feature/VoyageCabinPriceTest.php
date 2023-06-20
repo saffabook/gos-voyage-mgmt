@@ -849,4 +849,108 @@ class VoyageCabinPriceTest extends TestCase
 
         $this->assertDatabaseMissing('voyage_cabin_prices', $request);
     }
+
+    /**
+     * Ensure cabin prices list and voyages data are for one company only.
+     *
+     * @return void
+     */
+    public function testUserCanGetTheirOwnCabinPricesWithVoyages()
+    {
+        // Set up voyage data for Company One
+        $companyOneId            = 1;
+        $companyOneVessel        = Vessel::factory()->create(['companyId' => $companyOneId]);
+        $companyOneCabin         = VesselCabin::factory()->create(['vessel_id' => $companyOneVessel->id]);
+        $companyOneEmbarkPort    = VoyagePort::factory()->create(['companyId' => $companyOneVessel->companyId]);
+        $companyOneDisembarkPort = VoyagePort::factory()->create(['companyId' => $companyOneVessel->companyId]);
+
+        $companyOneVoyage = VesselVoyage::create([
+            'title'                 => 'Company One Test Voyage',
+            'description'           => 'Description for Test Voyage',
+            'vesselId'              => $companyOneVessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $companyOneEmbarkPort->id,
+            'startDate'             => Carbon::now()->subDays(22)->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $companyOneDisembarkPort->id,
+            'endDate'               => Carbon::now()->subDays(12)->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $companyOneId,
+            'voyageReferenceNumber' => GenerateVoyageId::execute($companyOneId),
+        ]);
+
+        $companyOneCabinPrice = VoyageCabinPrice::create([
+            'title'       => 'Company One Cabin Price',
+            'description' => 'price for testing',
+            'cabinId'     => $companyOneCabin->id,
+            'voyageId'    => $companyOneVoyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '9900',
+            'companyId'   => $companyOneId
+        ]);
+
+        // Set up voyage data for Company Two
+        $companyTwoId            = 2;
+        $companyTwoVessel        = Vessel::factory()->create(['companyId' => $companyTwoId]);
+        $companyTwoCabin         = VesselCabin::factory()->create(['vessel_id' => $companyTwoVessel->id]);
+        $companyTwoEmbarkPort    = VoyagePort::factory()->create(['companyId' => $companyTwoVessel->companyId]);
+        $companyTwoDisembarkPort = VoyagePort::factory()->create(['companyId' => $companyTwoVessel->companyId]);
+
+        $companyTwoVoyage = VesselVoyage::create([
+            'title'                 => 'Company Two Test Voyage',
+            'description'           => 'Description for Test Voyage',
+            'vesselId'              => $companyTwoVessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $companyTwoEmbarkPort->id,
+            'startDate'             => Carbon::now()->subDays(22)->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $companyTwoDisembarkPort->id,
+            'endDate'               => Carbon::now()->subDays(12)->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $companyTwoId,
+            'voyageReferenceNumber' => GenerateVoyageId::execute($companyTwoId),
+        ]);
+
+        $companyTwoCabinPrice = VoyageCabinPrice::create([
+            'title'       => 'Company Two Cabin Price',
+            'description' => 'price for testing',
+            'cabinId'     => $companyTwoCabin->id,
+            'voyageId'    => $companyTwoVoyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => '9900',
+            'companyId'   => $companyTwoId
+        ]);
+
+        $request = [
+            'companyId' => '1'
+        ];
+
+        $jsonResponse = $this->postJson('/api/prices/', $request);
+
+        // Assertions for response
+        $jsonResponse->assertStatus(200)
+                     ->assertJsonStructure(['data'])
+                     ->assertJsonCount(1, 'data')
+
+                     // Assert response contains data relevant to Company One
+                     ->assertJsonFragment(['id' => $companyOneCabinPrice->id])
+                     ->assertJsonFragment(['title' => $companyOneCabinPrice->title])
+                     ->assertJsonPath('data.0.cabinId', $companyOneCabin->id)
+                     ->assertJsonPath('data.0.voyageId', $companyOneVoyage->id)
+                     ->assertJsonPath('data.0.voyage.title', $companyOneVoyage->title)
+                     ->assertJsonPath('data.0.voyage.id', $companyOneVoyage->id)
+                     ->assertJsonPath('data.0.voyage.vesselId', $companyOneVessel->id)
+                     ->assertJsonPath('data.0.voyage.embarkPortId', $companyOneEmbarkPort->id)
+                     ->assertJsonPath('data.0.voyage.disembarkPortId', $companyOneDisembarkPort->id)
+
+                     // Assert response does not contain any data relevant to Company Two
+                     ->assertJsonMissing([$companyTwoCabinPrice])
+                     ->assertJsonMissing([$companyTwoVoyage])
+
+                     // Assert response data is limited to cabin prices and voyages
+                     ->assertJsonMissing([$companyOneVessel])
+                     ->assertJsonMissing([$companyOneCabin])
+                     ->assertJsonMissing([$companyOneEmbarkPort])
+                     ->assertJsonMissing([$companyOneDisembarkPort]);
+    }
 }
