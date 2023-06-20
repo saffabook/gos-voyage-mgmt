@@ -16,6 +16,8 @@ class CreateVoyageCabinPricesTable extends Migration
         Schema::create('voyage_cabin_prices', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->text('title');
+            $table->text('description')->nullable();
             $table->integer('cabinId');
             $table->integer('voyageId');
             $table->string('currency');
