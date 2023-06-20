@@ -17,7 +17,7 @@ class VesselCabin extends Model
         'description',
         'max_occupancy',
         'can_be_booked_single',
-        'vessel_id'
+        'vessel_id',
     ];
 
     /**
@@ -41,12 +41,12 @@ class VesselCabin extends Model
     }
 
     /**
-     * Get the price associated with the VesselCabin
+     * Get all of the prices for the VesselCabin
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function price(): HasOne
+    public function prices()
     {
-        return $this->hasOne(VoyageCabinPrice::class, 'cabinId');
+        return $this->hasMany(VoyageCabinPrice::class, 'cabinId');
     }
 }

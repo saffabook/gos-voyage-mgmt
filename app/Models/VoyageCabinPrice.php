@@ -11,6 +11,8 @@ class VoyageCabinPrice extends Model
     use HasFactory;
 
     protected $fillable = [
+        'title',
+        'description',
         'cabinId',
         'voyageId',
         'currency',
@@ -37,5 +39,15 @@ class VoyageCabinPrice extends Model
     public function voyage(): BelongsTo
     {
         return $this->belongsTo(VesselVoyage::class, 'voyageId');
+    }
+
+    /**
+     * Get the cabin that owns the VoyageCabinPrice
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function prices(): BelongsTo
+    {
+        return $this->belongsTo(VesselCabin::class);
     }
 }
