@@ -18,7 +18,7 @@ class GetCompanyVoyageById
         return VesselVoyage::where('companyId', $companyId)
                            ->with('embarkPort', 'disembarkPort')
                            ->with(['vessel.cabins.prices' => function ($query) use ($voyageId) {
-            $query->where('voyageId', $voyageId);
-        }])->find($voyageId);
+                               $query->where('voyageId', $voyageId);
+                           }])->find($voyageId);
     }
 }
