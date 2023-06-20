@@ -17,7 +17,9 @@ class ListVoyageCabinPrices extends Controller
      */
     public function __invoke(Request $request)
     {
-        $pricesFromDb = VoyageCabinPrice::get();
+        $pricesFromDb = VoyageCabinPrice::where(
+            'companyId', $request->input('companyId')
+        )->with('voyage')->get();
 
         if ($pricesFromDb->isEmpty()) {
           return ApiResponse::error('No prices found');
