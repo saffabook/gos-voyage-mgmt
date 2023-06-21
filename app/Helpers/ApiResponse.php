@@ -19,13 +19,11 @@ class ApiResponse
             }
         }
 
-        // return response()->json($data, 200, [], JSON_NUMERIC_CHECK)
-
         return response()->json(['data' => $responseData], 200, [], JSON_NUMERIC_CHECK);
     }
 
     public static function error($message)
     {
-        return response()->json(['error' => $message], 422);
+        return response()->json(['error' => $message], 422, [], JSON_NUMERIC_CHECK);
     }
 }
