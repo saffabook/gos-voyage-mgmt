@@ -929,6 +929,7 @@ class VoyageCabinPriceTest extends TestCase
         // var_dump($jsonResponse);
         var_dump($companyOneCabin->id);
         var_dump($jsonResponse['data'][0]['cabinId']);
+        var_dump($jsonResponse['data'][0]);
         exit;
 
         // Assertions for response
