@@ -14,12 +14,12 @@ class ListVesselCabins extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
-     * 
+     *
      * TODO: list vessels with cabins for relationships
      */
     public function __invoke(Request $request)
     {
-        $vesselCabinsFromDb = VesselCabin::with('additionals')->get();
+        $vesselCabinsFromDb = VesselCabin::with('additionals', 'price')->get();
 
         if ($vesselCabinsFromDb->isEmpty()) {
           return ApiResponse::error('No cabins found');

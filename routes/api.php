@@ -96,3 +96,13 @@ Route::group([
     Route::post('update/{id}', Controllers\Voyages\UpdateVoyagePort::class);
     Route::post('delete/{id}', Controllers\Voyages\DeleteVoyagePort::class);
 });
+
+Route::group([
+    'prefix' => 'prices'
+    ], function () {
+    Route::post('create', Controllers\Prices\CreateVoyageCabinPrice::class);
+    Route::post('/', Controllers\Prices\ListVoyageCabinPrices::class);
+    Route::post('get/{id}', Controllers\Prices\GetVoyageCabinPrice::class);
+    Route::post('update/{id}', Controllers\Prices\UpdateVoyageCabinPrice::class);
+    Route::post('delete/{id}', Controllers\Prices\DeleteVoyageCabinPrice::class);
+});

@@ -17,9 +17,12 @@ class GetVesselVoyage extends Controller
      */
     public function __invoke($voyageReferenceNumber)
     {
-        $voyage = VesselVoyage::with('embarkPort', 'disembarkPort')
-            ->where('voyageReferenceNumber', $voyageReferenceNumber)
-            ->first();
+        $voyage = VesselVoyage::with(
+            'embarkPort',
+            'disembarkPort',
+            'voyageCabinPrices'
+        )->where('voyageReferenceNumber', $voyageReferenceNumber)
+         ->first();
 
         if (empty($voyage)) {
             return ApiResponse::error('Voyage not found');
