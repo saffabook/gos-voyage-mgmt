@@ -922,7 +922,7 @@ class VoyageCabinPriceTest extends TestCase
         ]);
 
         $request = [
-            'companyId' => '1'
+            'companyId' => $companyOneId
         ];
 
         $jsonResponse = $this->postJson('/api/prices/', $request);
