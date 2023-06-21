@@ -926,6 +926,10 @@ class VoyageCabinPriceTest extends TestCase
         ];
 
         $jsonResponse = $this->postJson('/api/prices/', $request);
+        // var_dump($jsonResponse);
+        var_dump($companyOneCabin->id);
+        var_dump($jsonResponse['data'][0]['cabinId']);
+        exit;
 
         // Assertions for response
         $jsonResponse->assertStatus(200)
