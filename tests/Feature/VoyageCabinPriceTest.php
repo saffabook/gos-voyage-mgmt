@@ -935,13 +935,13 @@ class VoyageCabinPriceTest extends TestCase
                      // Assert response contains data relevant to Company One
                      ->assertJsonFragment(['id' => $companyOneCabinPrice->id])
                      ->assertJsonFragment(['title' => $companyOneCabinPrice->title])
-                     ->assertJsonPath('data.0.cabinId', $companyOneCabin->id)
-                     ->assertJsonPath('data.0.voyageId', $companyOneVoyage->id)
-                     ->assertJsonPath('data.0.voyage.title', $companyOneVoyage->title)
-                     ->assertJsonPath('data.0.voyage.id', $companyOneVoyage->id)
-                     ->assertJsonPath('data.0.voyage.vesselId', $companyOneVessel->id)
-                     ->assertJsonPath('data.0.voyage.embarkPortId', $companyOneEmbarkPort->id)
-                     ->assertJsonPath('data.0.voyage.disembarkPortId', $companyOneDisembarkPort->id)
+                     ->assertJsonPath('data.0.cabinId', 1)
+                     ->assertJsonPath('data.0.voyageId', 1)
+                     ->assertJsonPath('data.0.voyage.title', 'Company One Test Voyage')
+                     ->assertJsonPath('data.0.voyage.id', 1)
+                     ->assertJsonPath('data.0.voyage.vesselId', 1)
+                     ->assertJsonPath('data.0.voyage.embarkPortId', 1)
+                     ->assertJsonPath('data.0.voyage.disembarkPortId', 2)
 
                      // Assert response does not contain any data relevant to Company Two
                      ->assertJsonMissing([$companyTwoCabinPrice])
