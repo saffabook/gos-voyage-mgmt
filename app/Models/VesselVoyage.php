@@ -69,4 +69,14 @@ class VesselVoyage extends Model
     {
         return $this->hasOne(Vessel::class, 'id', 'vesselId');
     }
+
+    /**
+     * Get all of the prices for the VesselVoyage
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function prices(): HasMany
+    {
+        return $this->hasMany(VoyagePrice::class, 'id', 'vesselId');
+    }
 }

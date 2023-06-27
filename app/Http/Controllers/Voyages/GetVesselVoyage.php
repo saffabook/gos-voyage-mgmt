@@ -20,7 +20,7 @@ class GetVesselVoyage extends Controller
         $voyage = VesselVoyage::with(
             'embarkPort',
             'disembarkPort',
-            'voyageCabinPrices'
+            'prices'
         )->where('voyageReferenceNumber', $voyageReferenceNumber)
          ->first();
 
