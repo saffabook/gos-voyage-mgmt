@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Prices;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Models\VoyageCabinPrice;
+use App\Models\VoyagePrice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
-class DeleteVoyageCabinPrice extends Controller
+class DeleteVoyagePrice extends Controller
 {
     /**
      * Handle the incoming request.
@@ -18,7 +18,7 @@ class DeleteVoyageCabinPrice extends Controller
      */
     public function __invoke($id, Request $request)
     {
-        $price = VoyageCabinPrice::where('companyId', $request->companyId)
+        $price = VoyagePrice::where('companyId', $request->companyId)
                                  ->with('voyage')
                                  ->find($id);
 

@@ -6,12 +6,12 @@ use App\Helpers\ApiResponse;
 use App\Helpers\CheckSimilarWords;
 use App\Helpers\GetCompanyVoyageById;
 use App\Http\Controllers\Controller;
-use App\Models\VoyageCabinPrice;
+use App\Models\VoyagePrice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class CreateVoyageCabinPrice extends Controller
+class CreateVoyagePrice extends Controller
 {
     /**
      * Handle the incoming request.
@@ -24,7 +24,6 @@ class CreateVoyageCabinPrice extends Controller
         $validatedData = Validator::make($request->all(), [
             'title'                => 'required|string|max:255',
             'description'          => 'string|max:255',
-            'cabinId'              => 'required|integer',
             'voyageId'             => 'required|integer',
             'currency'             => 'required|string',
             'priceMinor'           => 'required|integer',
@@ -74,7 +73,7 @@ class CreateVoyageCabinPrice extends Controller
             }
         }
 
-        $price = VoyageCabinPrice::create($validatedData);
+        $price = VoyagePrice::create($validatedData);
 
         return ApiResponse::success($price->toArray(), 'The price was created');
     }

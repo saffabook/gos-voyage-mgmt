@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Prices;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Models\VoyageCabinPrice;
+use App\Models\VoyagePrice;
 use Illuminate\Http\Request;
 
-class ListVoyageCabinPrices extends Controller
+class ListVoyagePrices extends Controller
 {
     /**
      * Handle the incoming request.
@@ -17,7 +17,7 @@ class ListVoyageCabinPrices extends Controller
      */
     public function __invoke(Request $request)
     {
-        $pricesFromDb = VoyageCabinPrice::where(
+        $pricesFromDb = VoyagePrice::where(
             'companyId', $request->input('companyId')
         )->with('voyage')->get();
 

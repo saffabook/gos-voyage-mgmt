@@ -5,15 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class VoyageCabinPrice extends Model
+class VoyagePrice extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'title',
         'description',
-        'cabinId',
         'voyageId',
         'currency',
         'priceMinor',
@@ -22,17 +22,7 @@ class VoyageCabinPrice extends Model
     ];
 
     /**
-     * Get the cabin that owns the VoyageCabinPrice
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function cabin(): BelongsTo
-    {
-        return $this->belongsTo(VesselCabin::class, 'cabinId');
-    }
-
-    /**
-     * Get the voyage that owns the VoyageCabinPrice
+     * Get the voyage that owns the VoyagePrice
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -42,12 +32,12 @@ class VoyageCabinPrice extends Model
     }
 
     /**
-     * Get the cabin that owns the VoyageCabinPrice
+     * The cabins that belong to the VoyagePrice
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function prices(): BelongsTo
+    public function cabins(): BelongsToMany
     {
-        return $this->belongsTo(VesselCabin::class);
+        return $this->belongsToMany(VesselCabin::class, 'price_cabin_pivot', 'priceId', 'cabinId');
     }
 }
