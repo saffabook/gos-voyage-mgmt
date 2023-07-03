@@ -20,12 +20,33 @@ class GetVesselVoyage extends Controller
         $voyage = VesselVoyage::with(
             'embarkPort',
             'disembarkPort',
-            'prices'
+            'prices',
+            'prices.cabins',
+            'vessel.cabins.prices'
         )->where('voyageReferenceNumber', $voyageReferenceNumber)
          ->first();
 
         if (empty($voyage)) {
             return ApiResponse::error('Voyage not found');
+        }
+
+        unset(
+            $voyage->embarkPort['companyId'],
+            $voyage->disembarkPort['companyId'],
+            $voyage->vessel['companyId']
+        );
+
+        foreach ($voyage->prices as $price) {
+            unset($price['companyId']);
+            foreach ($price['cabins'] as $cabin) {
+                unset($cabin['pivot']);
+            }
+        }
+
+        foreach ($voyage->vessel['cabins'] as $cabin) {
+            foreach ($cabin['prices'] as $price) {
+                unset($price['pivot']);
+            }
         }
 
         return ApiResponse::success($voyage->toArray());
