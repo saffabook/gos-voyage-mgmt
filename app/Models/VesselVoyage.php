@@ -78,11 +78,6 @@ class VesselVoyage extends Model
      */
     public function prices(): HasMany
     {
-        return $this->hasMany(VoyagePrice::class, 'id', 'vesselId');
-    }
-
-    public function pricesWithCabins(): BelongsToMany
-    {
-        return $this->belongsToMany(VoyagePrice::class, 'id', 'vesselId');
+        return $this->hasMany(VoyagePrice::class, 'voyageId');
     }
 }

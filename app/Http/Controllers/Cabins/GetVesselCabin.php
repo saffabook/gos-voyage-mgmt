@@ -20,7 +20,7 @@ class GetVesselCabin extends Controller
         $vesselCabin = VesselCabin::with(
             'additionals',
             'vessel',
-            'price'
+            'prices'
         )->find($id);
 
         if (empty($vesselCabin)) {

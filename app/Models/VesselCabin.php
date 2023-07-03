@@ -46,8 +46,8 @@ class VesselCabin extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    // public function prices(): BelongsToMany
-    // {
-    //     return $this->belongsToMany(VoyagePrice::class, 'price_cabin_pivot', 'cabinId', 'priceId');
-    // }
+    public function prices(): BelongsToMany
+    {
+        return $this->belongsToMany(VoyagePrice::class, 'price_cabin_pivot', 'cabinId', 'priceId');
+    }
 }
