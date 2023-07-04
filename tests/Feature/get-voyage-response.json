@@ -1,0 +1,241 @@
+{
+    "data": {
+        "id": 1,
+        "created_at": "2023-07-03T14:29:08.000000Z",
+        "updated_at": "2023-07-03T14:29:08.000000Z",
+        "title": "Finland coast",
+        "description": "Description for lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        "vesselId": 1,
+        "voyageType": "ROUNDTRIP",
+        "voyageReferenceNumber": "ys6p-jw6rfpyr-1",
+        "isPassportRequired": 1,
+        "embarkPortId": 1,
+        "startDate": "2023-08-03",
+        "startTime": "11:50:00",
+        "disembarkPortId": 2,
+        "endDate": "2023-08-06",
+        "endTime": "16:30:00",
+        "companyId": 1,
+        "voyageStatus": "ACTIVE",
+        "embarkPort": {
+            "id": 1,
+            "created_at": "2023-07-03T14:28:40.000000Z",
+            "updated_at": "2023-07-03T14:28:40.000000Z",
+            "title": "Porvoo",
+            "description": "This is the description for ...",
+            "directions": "Directions for how to get to the port of ...",
+            "longitude": null,
+            "latitude": null,
+            "addressId": 42
+        },
+        "disembarkPort": {
+            "id": 2,
+            "created_at": "2023-07-03T14:28:47.000000Z",
+            "updated_at": "2023-07-03T14:28:47.000000Z",
+            "title": "Helsinki",
+            "description": "This is the description for ...",
+            "directions": "Directions for how to get to the port of ...",
+            "longitude": null,
+            "latitude": null,
+            "addressId": 42
+        },
+        "prices": [
+            {
+                "id": 1,
+                "title": "adults",
+                "description": "price for yhyhyhy",
+                "voyageId": 1,
+                "currency": "EUR",
+                "priceMinor": 100,
+                "discountedPriceMinor": null,
+                "created_at": "2023-07-03T14:30:00.000000Z",
+                "updated_at": "2023-07-03T14:30:00.000000Z",
+                "cabins": [
+                    {
+                        "id": 1,
+                        "created_at": "2023-07-03T14:27:39.000000Z",
+                        "updated_at": "2023-07-03T14:27:39.000000Z",
+                        "title": "port cabin",
+                        "description": "Description for ... yhyhyh",
+                        "max_occupancy": 2,
+                        "can_be_booked_single": 1,
+                        "vessel_id": 1
+                    },
+                    {
+                        "id": 2,
+                        "created_at": "2023-07-03T14:27:47.000000Z",
+                        "updated_at": "2023-07-03T14:27:47.000000Z",
+                        "title": "starboard cabin",
+                        "description": "Description for ... yhyhyh",
+                        "max_occupancy": 2,
+                        "can_be_booked_single": 1,
+                        "vessel_id": 1
+                    },
+                    {
+                        "id": 3,
+                        "created_at": "2023-07-03T14:27:55.000000Z",
+                        "updated_at": "2023-07-03T14:27:55.000000Z",
+                        "title": "aft cabin",
+                        "description": "Description for ... yhyhyh",
+                        "max_occupancy": 2,
+                        "can_be_booked_single": 1,
+                        "vessel_id": 1
+                    }
+                ]
+            },
+            {
+                "id": 2,
+                "title": "kids",
+                "description": "price for yhyhyhy",
+                "voyageId": 1,
+                "currency": "EUR",
+                "priceMinor": 50,
+                "discountedPriceMinor": null,
+                "created_at": "2023-07-03T14:30:55.000000Z",
+                "updated_at": "2023-07-03T14:30:55.000000Z",
+                "cabins": [
+                    {
+                        "id": 1,
+                        "created_at": "2023-07-03T14:27:39.000000Z",
+                        "updated_at": "2023-07-03T14:27:39.000000Z",
+                        "title": "port cabin",
+                        "description": "Description for ... yhyhyh",
+                        "max_occupancy": 2,
+                        "can_be_booked_single": 1,
+                        "vessel_id": 1
+                    },
+                    {
+                        "id": 2,
+                        "created_at": "2023-07-03T14:27:47.000000Z",
+                        "updated_at": "2023-07-03T14:27:47.000000Z",
+                        "title": "starboard cabin",
+                        "description": "Description for ... yhyhyh",
+                        "max_occupancy": 2,
+                        "can_be_booked_single": 1,
+                        "vessel_id": 1
+                    }
+                ]
+            }
+        ],
+        "vessel": {
+            "id": 1,
+            "created_at": "2023-07-03T14:26:41.000000Z",
+            "updated_at": "2023-07-03T14:26:41.000000Z",
+            "name": "vesselForPricesTest",
+            "vessel_type": "Type of ExampleVessel",
+            "year_built": "2023-01-01",
+            "length_overall": 2323,
+            "length_on_deck": 232,
+            "description": "This is the description for yhyhyh",
+            "cabins": [
+                {
+                    "id": 1,
+                    "created_at": "2023-07-03T14:27:39.000000Z",
+                    "updated_at": "2023-07-03T14:27:39.000000Z",
+                    "title": "port cabin",
+                    "description": "Description for ... yhyhyh",
+                    "max_occupancy": 2,
+                    "can_be_booked_single": 1,
+                    "vessel_id": 1,
+                    "prices": [
+                        {
+                            "id": 1,
+                            "title": "adults",
+                            "description": "price for yhyhyhy",
+                            "voyageId": 1,
+                            "currency": "EUR",
+                            "priceMinor": 100,
+                            "discountedPriceMinor": null,
+                            "companyId": 1,
+                            "created_at": "2023-07-03T14:30:00.000000Z",
+                            "updated_at": "2023-07-03T14:30:00.000000Z"
+                        },
+                        {
+                            "id": 2,
+                            "title": "kids",
+                            "description": "price for yhyhyhy",
+                            "voyageId": 1,
+                            "currency": "EUR",
+                            "priceMinor": 50,
+                            "discountedPriceMinor": null,
+                            "companyId": 1,
+                            "created_at": "2023-07-03T14:30:55.000000Z",
+                            "updated_at": "2023-07-03T14:30:55.000000Z"
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "created_at": "2023-07-03T14:27:47.000000Z",
+                    "updated_at": "2023-07-03T14:27:47.000000Z",
+                    "title": "starboard cabin",
+                    "description": "Description for ... yhyhyh",
+                    "max_occupancy": 2,
+                    "can_be_booked_single": 1,
+                    "vessel_id": 1,
+                    "prices": [
+                        {
+                            "id": 1,
+                            "title": "adults",
+                            "description": "price for yhyhyhy",
+                            "voyageId": 1,
+                            "currency": "EUR",
+                            "priceMinor": 100,
+                            "discountedPriceMinor": null,
+                            "companyId": 1,
+                            "created_at": "2023-07-03T14:30:00.000000Z",
+                            "updated_at": "2023-07-03T14:30:00.000000Z"
+                        },
+                        {
+                            "id": 2,
+                            "title": "kids",
+                            "description": "price for yhyhyhy",
+                            "voyageId": 1,
+                            "currency": "EUR",
+                            "priceMinor": 50,
+                            "discountedPriceMinor": null,
+                            "companyId": 1,
+                            "created_at": "2023-07-03T14:30:55.000000Z",
+                            "updated_at": "2023-07-03T14:30:55.000000Z"
+                        }
+                    ]
+                },
+                {
+                    "id": 3,
+                    "created_at": "2023-07-03T14:27:55.000000Z",
+                    "updated_at": "2023-07-03T14:27:55.000000Z",
+                    "title": "aft cabin",
+                    "description": "Description for ... yhyhyh",
+                    "max_occupancy": 2,
+                    "can_be_booked_single": 1,
+                    "vessel_id": 1,
+                    "prices": [
+                        {
+                            "id": 1,
+                            "title": "adults",
+                            "description": "price for yhyhyhy",
+                            "voyageId": 1,
+                            "currency": "EUR",
+                            "priceMinor": 100,
+                            "discountedPriceMinor": null,
+                            "companyId": 1,
+                            "created_at": "2023-07-03T14:30:00.000000Z",
+                            "updated_at": "2023-07-03T14:30:00.000000Z"
+                        }
+                    ]
+                },
+                {
+                    "id": 4,
+                    "created_at": "2023-07-03T14:28:00.000000Z",
+                    "updated_at": "2023-07-03T14:28:00.000000Z",
+                    "title": "stern cabin",
+                    "description": "Description for ... yhyhyh",
+                    "max_occupancy": 2,
+                    "can_be_booked_single": 1,
+                    "vessel_id": 1,
+                    "prices": []
+                }
+            ]
+        }
+    }
+}

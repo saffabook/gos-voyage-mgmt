@@ -1,0 +1,14 @@
+{
+    "data": {
+        "title": "exampleResponse",
+        "description": "price for yhyhyhy",
+        "voyageId": 1,
+        "currency": "EUR",
+        "priceMinor": 4200,
+        "companyId": 1,
+        "updated_at": "2023-07-04T05:38:42.000000Z",
+        "created_at": "2023-07-04T05:38:42.000000Z",
+        "id": 3,
+        "message": "The price was created"
+    }
+}
