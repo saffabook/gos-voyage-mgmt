@@ -7,6 +7,7 @@ use App\Helpers\AttachPriceCabin;
 use App\Helpers\CheckSimilarWords;
 use App\Helpers\GetCompanyVoyageById;
 use App\Http\Controllers\Controller;
+use App\Models\VesselCabin;
 use App\Models\VoyagePrice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -64,24 +65,23 @@ class CreateVoyagePrice extends Controller
             if(! in_array($cabinIdToPrice, $vesselCabinIds)) {
                 return ApiResponse::error('Cabin id '. $cabinIdToPrice.' does not belong to the selected vessel. You cannot add a price to this cabin');
             }
-        }
 
-        // Check cabin's price titles.
-        $cabinsToBePriced = collect($voyage->vessel->cabins)->toArray();
-        $cabinPriceTitles = collect($voyage->prices)->pluck('title')->toArray();
+            // Check cabin's price titles for duplicates on requested voyage.
+            if (in_array($cabinIdToPrice, $vesselCabinIds)) {
+                $cabin = VesselCabin::where('id', $cabinIdToPrice)->with('prices')->get();
+                $cabin = $cabin->toArray();
+                $cabinPrices = $cabin[0]['prices'];
 
-        foreach ($cabinsToBePriced as $cabin) {
-            if (! in_array($cabin['id'], $validatedData['cabinIds'])) {
-                foreach ($cabinPriceTitles as $title) {
-                    if ($title === $validatedData['title']) {
+                foreach ($cabinPrices as $price) {
+                    if ($price['title'] === $validatedData['title'] && $price['voyageId'] == $validatedData['voyageId']) {
                         return ApiResponse::error(
-                            "The cabin '{$cabin['title']}' already has a price called '{$validatedData['title']}'. Try creating a different title or remove this cabin from the requested selection."
+                            "The cabin '{$cabin[0]['title']}' already has a price for this voyage called '{$validatedData['title']}'. Try creating a different title or remove this cabin from the requested selection."
                         );
                     }
 
-                    if (CheckSimilarWords::execute($title, $validatedData['title'], 3)) {
+                    if (CheckSimilarWords::execute($price['title'], $validatedData['title'], 3) && $price['voyageId'] == $validatedData['voyageId']) {
                         return ApiResponse::error(
-                            "The title '{$validatedData['title']}' is too similar to '{$title}'. Please create a different title."
+                            "The cabin '{$cabin[0]['title']}' already has a price for this voyage called '{$price['title']}', which is too similar to '{$validatedData['title']}'. Please create a different title."
                         );
                     }
                 }

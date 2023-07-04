@@ -673,7 +673,7 @@ class VoyagePriceTest extends TestCase
         $duplicateResponse = $this->postJson('/api/prices/create', $duplicateRequest);
         $duplicateResponse->assertStatus(422)
                           ->assertJson([
-                              'error' => "The cabin '{$cabin['title']}' already has a price called '{$duplicateRequest['title']}'. Try creating a different title or remove this cabin from the requested selection."
+                              'error' => "The cabin '{$cabin['title']}' already has a price for this voyage called '{$duplicateRequest['title']}'. Try creating a different title or remove this cabin from the requested selection."
                           ]);
 
         $this->assertDatabasehas('voyage_prices', [
@@ -747,7 +747,7 @@ class VoyagePriceTest extends TestCase
         $initialResponse = $this->postJson('/api/prices/create', $initialRequest);
         $initialResponse->assertStatus(200);
 
-        $duplicateRequest = [
+        $similarTitleRequest = [
             'title'       => 'children',
             'description' => 'price for children',
             'cabinIds'    => [$cabin->id],
@@ -757,11 +757,10 @@ class VoyagePriceTest extends TestCase
             'companyId'   => $companyId
         ];
 
-        $duplicateResponse = $this->postJson('/api/prices/create', $duplicateRequest);
-        $duplicateResponse->assertStatus(422)
-                          ->assertJson([
-                              'error' => "The title 'children' is too similar to 'child'. Please create a different title."
-                          ]);
+        $similarTitleResponse = $this->postJson('/api/prices/create', $similarTitleRequest);
+        $similarTitleResponse->assertStatus(422)->assertJson([
+            'error' => "The cabin '{$cabin->title}' already has a price for this voyage called 'child', which is too similar to 'children'. Please create a different title."
+        ]);
 
         $this->assertDatabasehas('voyage_prices', [
             'title'      => $initialRequest['title'],
@@ -776,9 +775,9 @@ class VoyagePriceTest extends TestCase
         ]);
 
         $this->assertDatabaseMissing('voyage_prices', [
-            'title'      => $duplicateRequest['title'],
-            'voyageId'   => $duplicateRequest['voyageId'],
-            'priceMinor' => $duplicateRequest['currency']
+            'title'      => $similarTitleRequest['title'],
+            'voyageId'   => $similarTitleRequest['voyageId'],
+            'priceMinor' => $similarTitleRequest['currency']
         ]);
 
         $this->assertDatabaseCount('voyage_prices', '1');
