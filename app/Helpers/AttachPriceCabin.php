@@ -7,7 +7,7 @@ use App\Models\VoyagePrice;
 class AttachPriceCabin
 {
     /**
-     * Undocumented function
+     * Function to attach a cabin to a price
      *
      * @param int $priceId
      * @param int $cabinId
