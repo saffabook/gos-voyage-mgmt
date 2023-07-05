@@ -7,11 +7,8 @@ use App\Models\Vessel;
 use App\Models\VesselCabin;
 use App\Models\VesselVoyage;
 use App\Models\VoyagePort;
-use App\Models\VoyagePrice;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\CommonSetups\Voyages\VoyageTestSetupService;
 use Tests\TestCase;
 
 class VoyagePriceTest extends TestCase
@@ -671,10 +668,12 @@ class VoyagePriceTest extends TestCase
         ];
 
         $duplicateResponse = $this->postJson('/api/prices/create', $duplicateRequest);
-        $duplicateResponse->assertStatus(422)
-                          ->assertJson([
-                              'error' => "The cabin '{$cabin['title']}' already has a price for this voyage called '{$duplicateRequest['title']}'. Try creating a different title or remove this cabin from the requested selection."
-                          ]);
+        $duplicateResponse->assertStatus(422)->assertJson([
+            "error" => [
+                "errorType" => "Price title match",
+                "message"   => "The cabin '{$cabin->title}' already has a price for this voyage called '{$initialRequest['title']}', which is too similar to '{$duplicateRequest['title']}'. Please create a different title."
+            ]
+        ]);
 
         $this->assertDatabasehas('voyage_prices', [
             'title'      => $initialRequest['title'],
@@ -759,7 +758,10 @@ class VoyagePriceTest extends TestCase
 
         $similarTitleResponse = $this->postJson('/api/prices/create', $similarTitleRequest);
         $similarTitleResponse->assertStatus(422)->assertJson([
-            'error' => "The cabin '{$cabin->title}' already has a price for this voyage called 'child', which is too similar to 'children'. Please create a different title."
+            "error" => [
+                "errorType" => "Price title match",
+                "message"   => "The cabin '{$cabin->title}' already has a price for this voyage called 'child', which is too similar to 'children'. Please create a different title."
+            ]
         ]);
 
         $this->assertDatabasehas('voyage_prices', [

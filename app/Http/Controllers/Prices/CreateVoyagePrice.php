@@ -16,10 +16,12 @@ use Illuminate\Support\Facades\Validator;
 class CreateVoyagePrice extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Handle the incoming request, validate request data, perform necessary
+     * checking logic, create price and attach requested cabins to
+     * the newly created price.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \App\Helpers\ApiResponse
      */
     public function __invoke(Request $request)
     {
@@ -69,19 +71,18 @@ class CreateVoyagePrice extends Controller
             // Check cabin's price titles for duplicates on requested voyage.
             if (in_array($cabinIdToPrice, $vesselCabinIds)) {
                 $cabin = VesselCabin::where('id', $cabinIdToPrice)->with('prices')->get();
-                $cabin = $cabin->toArray();
-                $cabinPrices = $cabin[0]['prices'];
 
-                foreach ($cabinPrices as $price) {
-                    if ($price['title'] === $validatedData['title'] && $price['voyageId'] == $validatedData['voyageId']) {
-                        return ApiResponse::error(
-                            "The cabin '{$cabin[0]['title']}' already has a price for this voyage called '{$validatedData['title']}'. Try creating a different title or remove this cabin from the requested selection."
-                        );
+                $firstCabin = $cabin->first();
+
+                foreach ($firstCabin->prices as $price) {
+                    if (intval($price->voyageId) !== intval($validatedData['voyageId'])) {
+                        continue;
                     }
 
-                    if (CheckSimilarWords::execute($price['title'], $validatedData['title'], 3) && $price['voyageId'] == $validatedData['voyageId']) {
+                    if (CheckSimilarWords::execute($price->title, $validatedData['title'], 3)) {
                         return ApiResponse::error(
-                            "The cabin '{$cabin[0]['title']}' already has a price for this voyage called '{$price['title']}', which is too similar to '{$validatedData['title']}'. Please create a different title."
+                            ['errorType' => 'Price title match'],
+                            "The cabin '{$firstCabin->title}' already has a price for this voyage called '{$price->title}', which is too similar to '{$validatedData['title']}'. Please create a different title."
                         );
                     }
                 }
