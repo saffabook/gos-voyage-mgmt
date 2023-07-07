@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Prices;
 
 use App\Helpers\ApiResponse;
-use App\Helpers\AttachPriceCabin;
 use App\Helpers\CheckSimilarWords;
 use App\Helpers\GetCompanyVoyageById;
 use App\Http\Controllers\Controller;
@@ -16,9 +15,7 @@ use Illuminate\Support\Facades\Validator;
 class CreateVoyagePrice extends Controller
 {
     /**
-     * Handle the incoming request, validate request data, perform necessary
-     * checking logic, create price and attach requested cabins to
-     * the newly created price.
+     * Create a price for a voyage and assign the price to cabins.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \App\Helpers\ApiResponse
@@ -92,7 +89,7 @@ class CreateVoyagePrice extends Controller
         $price = VoyagePrice::create($validatedData);
 
         foreach($cabinIdsToBePriced as $cabinIdToPrice) {
-            AttachPriceCabin::execute($price->id, $cabinIdToPrice);
+            $price->cabins()->attach($cabinIdToPrice);
         }
 
         return ApiResponse::success($price->toArray(), 'The price was created');
