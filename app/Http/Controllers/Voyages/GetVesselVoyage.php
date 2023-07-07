@@ -36,12 +36,6 @@ class GetVesselVoyage extends Controller
             }
         }
 
-        foreach ($voyage->vessel['cabins'] as $cabin) {
-            foreach ($cabin['prices'] as $price) {
-                unset($price['pivot']);
-            }
-        }
-
         return ApiResponse::success($voyage->toArray());
     }
 }

@@ -7,7 +7,8 @@ use App\Models\VesselVoyage;
 class GetVoyageData
 {
     /**
-     * Function to get voyage data.
+     * Helper to get complete voyage data from the database by
+     * voyageReferenceNumber.
      *
      * @param string $voyageReferenceNumber
      * @return VesselVoyage
@@ -15,11 +16,10 @@ class GetVoyageData
     public static function execute($voyageReferenceNumber)
     {
         $voyage = VesselVoyage::with(
+            'vessel.cabins',
             'embarkPort',
             'disembarkPort',
-            'prices',
             'prices.cabins',
-            'vessel.cabins.prices'
         )->where('voyageReferenceNumber', $voyageReferenceNumber)
          ->first();
 
