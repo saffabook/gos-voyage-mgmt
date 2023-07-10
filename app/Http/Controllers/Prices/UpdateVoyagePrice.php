@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Prices;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Models\VoyageCabinPrice;
+use App\Models\VoyagePrice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class UpdateVoyageCabinPrice extends Controller
+class UpdateVoyagePrice extends Controller
 {
     /**
      * Handle the incoming request.
@@ -34,7 +34,7 @@ class UpdateVoyageCabinPrice extends Controller
 
         $validatedData = $validatedData->validated();
 
-        $price = VoyageCabinPrice::where('companyId', $request->companyId)
+        $price = VoyagePrice::where('companyId', $request->companyId)
                                  ->with('voyage')
                                  ->find($id);
 

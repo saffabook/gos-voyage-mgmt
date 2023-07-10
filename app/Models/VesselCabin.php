@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class VesselCabin extends Model
 {
@@ -18,6 +18,7 @@ class VesselCabin extends Model
         'max_occupancy',
         'can_be_booked_single',
         'vessel_id',
+        'priceId'
     ];
 
     /**
@@ -41,12 +42,12 @@ class VesselCabin extends Model
     }
 
     /**
-     * Get all of the prices for the VesselCabin
+     * The prices that belong to the VesselCabin
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function prices()
+    public function prices(): BelongsToMany
     {
-        return $this->hasMany(VoyageCabinPrice::class, 'cabinId');
+        return $this->belongsToMany(VoyagePrice::class, 'price_cabin_pivot', 'cabinId', 'priceId');
     }
 }

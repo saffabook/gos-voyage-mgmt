@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Voyages;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\VesselVoyage;
 use App\Helpers\ApiResponse;
+use App\Helpers\GetVoyageData;
 
 class GetVesselVoyage extends Controller
 {
@@ -17,15 +17,23 @@ class GetVesselVoyage extends Controller
      */
     public function __invoke($voyageReferenceNumber)
     {
-        $voyage = VesselVoyage::with(
-            'embarkPort',
-            'disembarkPort',
-            'voyageCabinPrices'
-        )->where('voyageReferenceNumber', $voyageReferenceNumber)
-         ->first();
+        $voyage = GetVoyageData::execute($voyageReferenceNumber);
 
         if (empty($voyage)) {
             return ApiResponse::error('Voyage not found');
+        }
+
+        unset(
+            $voyage->embarkPort['companyId'],
+            $voyage->disembarkPort['companyId'],
+            $voyage->vessel['companyId']
+        );
+
+        foreach ($voyage->prices as $price) {
+            unset($price['companyId']);
+            foreach ($price['cabins'] as $cabin) {
+                unset($cabin['pivot']);
+            }
         }
 
         return ApiResponse::success($voyage->toArray());

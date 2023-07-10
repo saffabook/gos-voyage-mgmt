@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateVoyageCabinPricesTable extends Migration
+class CreateVoyagePricesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,16 @@ class CreateVoyageCabinPricesTable extends Migration
      */
     public function up()
     {
-        Schema::create('voyage_cabin_prices', function (Blueprint $table) {
+        Schema::create('voyage_prices', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
             $table->text('title');
             $table->text('description')->nullable();
-            $table->integer('cabinId');
             $table->integer('voyageId');
             $table->string('currency');
             $table->integer('priceMinor');
             $table->integer('discountedPriceMinor')->nullable();
             $table->integer('companyId');
+            $table->timestamps();
         });
     }
 
@@ -34,6 +33,6 @@ class CreateVoyageCabinPricesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('voyage_cabin_prices');
+        Schema::dropIfExists('voyage_prices');
     }
 }

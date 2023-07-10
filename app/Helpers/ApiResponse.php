@@ -22,8 +22,12 @@ class ApiResponse
         return response()->json(['data' => $responseData], 200, [], JSON_NUMERIC_CHECK);
     }
 
-    public static function error($message)
+    public static function error($data, $message = false)
     {
-        return response()->json(['error' => $message], 422, [], JSON_NUMERIC_CHECK);
+        if (is_array($data) && is_string($message)) {
+            $data['message'] = $message;
+        }
+
+        return response()->json(['error' => $data], 422, [], JSON_NUMERIC_CHECK);
     }
 }
