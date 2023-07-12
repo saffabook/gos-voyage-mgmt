@@ -931,4 +931,558 @@ class VoyagePriceTest extends TestCase
         $this->assertDatabaseCount('voyage_prices', '2');
         $this->assertDatabaseCount('price_cabin_pivot', '2');
     }
+
+    /**
+     * When updating a price, ensure modifying inactive voyage yields no errors.
+     *
+     * @return void
+     */
+    public function testUserCanUpdateTheirOwnPriceWhenVoyageIsNotActive()
+    {
+        $companyId     = 1;
+        $vessel        = Vessel::factory()->create(['companyId' => $companyId]);
+        $cabin         = VesselCabin::factory()->create(['vessel_id' => $vessel->id]);
+        $embarkPort    = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
+        $disembarkPort = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
+
+        $voyage = VesselVoyage::create([
+            'title'                 => 'Test Voyage',
+            'description'           => 'Description for Test Voyage',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $embarkPort->id,
+            'startDate'             => Carbon::now()->addDays(12)->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $disembarkPort->id,
+            'endDate'               => Carbon::now()->addDays(22)->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $companyId,
+            'voyageStatus'          => 'DRAFT',
+            'voyageReferenceNumber' => GenerateVoyageId::execute($companyId),
+        ]);
+
+        $createPriceRequest = [
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinIds'    => [$cabin->id],
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => 11000,
+            'companyId'   => $companyId
+        ];
+
+        $createPriceResponse = $this->postJson('/api/prices/create', $createPriceRequest);
+        $createPriceResponse->assertStatus(200);
+
+        $price = $createPriceResponse['data'];
+
+        $updatePriceRequest = [
+            'title'       => 'updated title',
+            'description' => 'updated description',
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => 42000,
+            'companyId'   => $companyId
+        ];
+
+        $updatePriceResponse = $this->postJson('/api/prices/update/' . $price['id'], $updatePriceRequest);
+
+        $updatePriceResponse->assertStatus(200)
+                            ->assertJsonStructure(['data'])
+                            ->assertJsonFragment(['title'       => $updatePriceRequest['title']])
+                            ->assertJsonFragment(['description' => $updatePriceRequest['description']])
+                            ->assertJsonFragment(['priceMinor'  => $updatePriceRequest['priceMinor']]);
+
+        $this->assertDatabasehas('voyage_prices', [
+            'title'       => $updatePriceRequest['title'],
+            'description' => $updatePriceRequest['description'],
+            'priceMinor'  => $updatePriceRequest['priceMinor']
+        ]);
+    }
+
+    /**
+     * Ensure user cannot update another company's price.
+     *
+     * @return void
+     */
+    public function testUserCannotUpdateOtherUsersPrices()
+    {
+        $companyId     = 1;
+        $vessel        = Vessel::factory()->create(['companyId' => $companyId]);
+        $cabin         = VesselCabin::factory()->create(['vessel_id' => $vessel->id]);
+        $embarkPort    = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
+        $disembarkPort = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
+
+        $voyage = VesselVoyage::create([
+            'title'                 => 'Test Voyage',
+            'description'           => 'Description for Test Voyage',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $embarkPort->id,
+            'startDate'             => Carbon::now()->addDays(12)->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $disembarkPort->id,
+            'endDate'               => Carbon::now()->addDays(22)->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $companyId,
+            'voyageStatus'          => 'DRAFT',
+            'voyageReferenceNumber' => GenerateVoyageId::execute($companyId),
+        ]);
+
+        $createPriceRequest = [
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinIds'    => [$cabin->id],
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => 11000,
+            'companyId'   => $companyId
+        ];
+
+        $createPriceResponse = $this->postJson('/api/prices/create', $createPriceRequest);
+        $createPriceResponse->assertStatus(200);
+
+        $price = $createPriceResponse['data'];
+
+        $updatePriceRequest = [
+            'title'       => 'updated title',
+            'description' => 'updated description',
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => 42000,
+            'companyId'   => 2
+        ];
+
+        $updatePriceResponse = $this->postJson('/api/prices/update/' . $price['id'], $updatePriceRequest);
+
+        $updatePriceResponse->assertStatus(422)
+                            ->assertJson([
+                                'error' => 'Price not found.'
+                            ]);
+    }
+
+    /**
+     * Ensure user cannot update price's priceMinor value if voyage is active.
+     *
+     * @return void
+     */
+    public function testUserCannotUpdatePriceMinorValueIfVoyageIsActive()
+    {
+        $companyId     = 1;
+        $vessel        = Vessel::factory()->create(['companyId' => $companyId]);
+        $cabin         = VesselCabin::factory()->create(['vessel_id' => $vessel->id]);
+        $embarkPort    = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
+        $disembarkPort = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
+
+        $voyage = VesselVoyage::create([
+            'title'                 => 'Test Voyage',
+            'description'           => 'Description for Test Voyage',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $embarkPort->id,
+            'startDate'             => Carbon::now()->addDays(12)->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $disembarkPort->id,
+            'endDate'               => Carbon::now()->addDays(22)->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $companyId,
+            'voyageReferenceNumber' => GenerateVoyageId::execute($companyId),
+        ]);
+
+        $createPriceRequest = [
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinIds'    => [$cabin->id],
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => 11000,
+            'companyId'   => $companyId
+        ];
+
+        $createPriceResponse = $this->postJson('/api/prices/create', $createPriceRequest);
+        $createPriceResponse->assertStatus(200);
+
+        $price = $createPriceResponse['data'];
+
+        $updatePriceRequest = [
+            'voyageId'    => $voyage->id,
+            'priceMinor'  => 42000,
+            'companyId'   => $companyId
+        ];
+
+        $updatePriceResponse = $this->postJson('/api/prices/update/' . $price['id'], $updatePriceRequest);
+
+        $updatePriceResponse->assertStatus(422)
+                            ->assertJson([
+                                'error' => 'This voyage is active. Price can only be updated with forceAction. Would you like to add a promotional price?'
+                            ]);
+    }
+
+    /**
+     * Ensure user can update price with confirmation, if voyage is active.
+     *
+     * @return void
+     */
+    public function testUserCanUpdatePriceWithForceAction()
+    {
+        $companyId     = 1;
+        $vessel        = Vessel::factory()->create(['companyId' => $companyId]);
+        $cabin         = VesselCabin::factory()->create(['vessel_id' => $vessel->id]);
+        $embarkPort    = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
+        $disembarkPort = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
+
+        $voyage = VesselVoyage::create([
+            'title'                 => 'Test Voyage',
+            'description'           => 'Description for Test Voyage',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $embarkPort->id,
+            'startDate'             => Carbon::now()->addDays(12)->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $disembarkPort->id,
+            'endDate'               => Carbon::now()->addDays(22)->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $companyId,
+            'voyageReferenceNumber' => GenerateVoyageId::execute($companyId),
+        ]);
+
+        $createPriceRequest = [
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinIds'    => [$cabin->id],
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => 11000,
+            'companyId'   => $companyId
+        ];
+
+        $createPriceResponse = $this->postJson('/api/prices/create', $createPriceRequest);
+        $createPriceResponse->assertStatus(200);
+
+        $price = $createPriceResponse['data'];
+
+        $updatePriceRequest = [
+            'voyageId'    => $voyage->id,
+            'priceMinor'  => 42000,
+            'companyId'   => $companyId,
+            'forceAction' => 1
+        ];
+
+        $updatePriceResponse = $this->postJson('/api/prices/update/' . $price['id'], $updatePriceRequest);
+
+        $updatePriceResponse->assertStatus(200)
+                            ->assertJsonStructure(['data'])
+                            ->assertJsonFragment(['priceMinor' => $updatePriceRequest['priceMinor']]);
+
+        $this->assertDatabasehas('voyage_prices', [
+            'title'       => $createPriceRequest['title'],
+            'description' => $createPriceRequest['description'],
+            'priceMinor'  => $updatePriceRequest['priceMinor']
+        ]);
+    }
+
+    /**
+     * Ensure updated priceMinor is an integer.
+     *
+     * @return void
+     */
+    public function testUserCannotUpdatePriceIfValueIsNotMinor()
+    {
+        $companyId     = 1;
+        $vessel        = Vessel::factory()->create(['companyId' => $companyId]);
+        $cabin         = VesselCabin::factory()->create(['vessel_id' => $vessel->id]);
+        $embarkPort    = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
+        $disembarkPort = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
+
+        $voyage = VesselVoyage::create([
+            'title'                 => 'Test Voyage',
+            'description'           => 'Description for Test Voyage',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $embarkPort->id,
+            'startDate'             => Carbon::now()->addDays(12)->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $disembarkPort->id,
+            'endDate'               => Carbon::now()->addDays(22)->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $companyId,
+            'voyageReferenceNumber' => GenerateVoyageId::execute($companyId),
+        ]);
+
+        $createPriceRequest = [
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinIds'    => [$cabin->id],
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => 11000,
+            'companyId'   => $companyId
+        ];
+
+        $createPriceResponse = $this->postJson('/api/prices/create', $createPriceRequest);
+        $createPriceResponse->assertStatus(200);
+
+        $price = $createPriceResponse['data'];
+
+        $updatePriceRequest = [
+            'voyageId'    => $voyage->id,
+            // 'priceMinor'  => 420.00,
+            'priceMinor'  => 420.99,
+            'companyId'   => $companyId,
+            'forceAction' => 1
+        ];
+
+        $updatePriceResponse = $this->postJson('/api/prices/update/' . $price['id'], $updatePriceRequest);
+
+        $updatePriceResponse->assertStatus(422);
+
+        $this->assertSame(
+            $updatePriceResponse['error']['priceMinor'][0],
+            'The price minor must be an integer.'
+        );
+
+        $this->assertDatabaseMissing('voyage_prices', [
+            'priceMinor' => $updatePriceRequest['priceMinor']
+        ]);
+    }
+
+    // /**
+    //  * Ensure currency is present.
+    //  *
+    //  * @return void
+    //  */
+    // public function testUserCannotUpdatePriceWithoutCurrency()
+    // {}
+
+    /**
+     * Ensure discountedPriceMinor is not set higher than priceMinor.
+     *
+     * @return void
+     */
+    public function testUserCannotUpdatePriceIfDiscountValueIsGreaterThanOriginal()
+    {
+        $companyId     = 1;
+        $vessel        = Vessel::factory()->create(['companyId' => $companyId]);
+        $cabin         = VesselCabin::factory()->create(['vessel_id' => $vessel->id]);
+        $embarkPort    = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
+        $disembarkPort = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
+
+        $voyage = VesselVoyage::create([
+            'title'                 => 'Test Voyage',
+            'description'           => 'Description for Test Voyage',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $embarkPort->id,
+            'startDate'             => Carbon::now()->addDays(12)->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $disembarkPort->id,
+            'endDate'               => Carbon::now()->addDays(22)->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $companyId,
+            'voyageReferenceNumber' => GenerateVoyageId::execute($companyId),
+        ]);
+
+        $createPriceRequest = [
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinIds'    => [$cabin->id],
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => 11000,
+            'companyId'   => $companyId
+        ];
+
+        $createPriceResponse = $this->postJson('/api/prices/create', $createPriceRequest);
+        $createPriceResponse->assertStatus(200);
+
+        $price = $createPriceResponse['data'];
+
+        $updatePriceRequest = [
+            'voyageId'             => $voyage->id,
+            'discountedPriceMinor' => 42000,
+            'companyId'            => $companyId
+        ];
+
+        $updatePriceResponse = $this->postJson('/api/prices/update/' . $price['id'], $updatePriceRequest);
+
+        $updatePriceResponse->assertStatus(422)
+                            ->assertJson([
+                                'error' => 'Discounted price must be lower than original price.'
+                            ]);
+
+        $this->assertDatabaseMissing('voyage_prices', [
+            'discountedPriceMinor' => $updatePriceRequest['discountedPriceMinor']
+        ]);
+    }
+
+    /**
+     * Ensure updated price title cannot be identical to a price title attached
+     * to the same cabin for the same voyage.
+     *
+     * @return void
+     */
+    public function testUserCannotUpdatePriceTitleToBeDuplicateForCabinPerVoyage()
+    {
+        $companyId     = 1;
+        $vessel        = Vessel::factory()->create(['companyId' => $companyId]);
+        $cabin         = VesselCabin::factory()->create(['vessel_id' => $vessel->id]);
+        $embarkPort    = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
+        $disembarkPort = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
+
+        $voyage = VesselVoyage::create([
+            'title'                 => 'Test Voyage',
+            'description'           => 'Description for Test Voyage',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $embarkPort->id,
+            'startDate'             => Carbon::now()->addDays(12)->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $disembarkPort->id,
+            'endDate'               => Carbon::now()->addDays(22)->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $companyId,
+            'voyageReferenceNumber' => GenerateVoyageId::execute($companyId),
+        ]);
+
+        $createPriceRequest = [
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinIds'    => [$cabin->id],
+            'voyageId'    => $voyage->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => 11000,
+            'companyId'   => $companyId
+        ];
+
+        $createPriceResponse = $this->postJson('/api/prices/create', $createPriceRequest);
+        $createPriceResponse->assertStatus(200);
+
+        $price = $createPriceResponse['data'];
+
+        $updatePriceRequest = [
+            'voyageId'  => $voyage->id,
+            'title'     => 'adults',
+            'companyId' => $companyId
+        ];
+
+        $updatePriceResponse = $this->postJson('/api/prices/update/' . $price['id'], $updatePriceRequest);
+
+        $updatePriceResponse->assertStatus(422)->assertJson([
+            "error" => [
+                "errorType" => "Price title match",
+                "message"   => "The cabin '{$cabin->title}' already has a price for this voyage called '{$createPriceRequest['title']}', which is too similar to '{$updatePriceRequest['title']}'. Please create a different title."
+            ]
+        ]);
+    }
+
+    /**
+     * Ensure updated price title can be identical to a price title attached to
+     * the same cabin on different voyages.
+     *
+     * @return void
+     */
+    public function testUserCanUpdatePriceTitleToBeDuplicateForCabinOnSeparateVoyages()
+    {
+        $companyId     = 1;
+        $vessel        = Vessel::factory()->create(['companyId' => $companyId]);
+        $cabin         = VesselCabin::factory()->create(['vessel_id' => $vessel->id]);
+        $embarkPort    = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
+        $disembarkPort = VoyagePort::factory()->create(['companyId' => $vessel->companyId]);
+
+        $voyage1 = VesselVoyage::create([
+            'title'                 => 'Test Voyage One',
+            'description'           => 'Description for Test Voyage One',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $embarkPort->id,
+            'startDate'             => Carbon::now()->subDays(2)->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $disembarkPort->id,
+            'endDate'               => Carbon::now()->addDays(2)->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $companyId,
+            'voyageReferenceNumber' => GenerateVoyageId::execute($companyId),
+        ]);
+
+        $voyage2 = VesselVoyage::create([
+            'title'                 => 'Test Voyage Two',
+            'description'           => 'Description for Test Voyage Two',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $embarkPort->id,
+            'startDate'             => Carbon::now()->addDays(12)->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $disembarkPort->id,
+            'endDate'               => Carbon::now()->addDays(22)->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $companyId,
+            'voyageReferenceNumber' => GenerateVoyageId::execute($companyId),
+        ]);
+
+        $voyage1Price = [
+            'title'       => 'test',
+            'description' => 'price for testing',
+            'cabinIds'    => [$cabin->id],
+            'voyageId'    => $voyage1->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => 11000,
+            'companyId'   => $companyId
+        ];
+
+        $createPrice1Response = $this->postJson('/api/prices/create', $voyage1Price);
+        $createPrice1Response->assertStatus(200);
+
+        $voyage2Price = [
+            'title'       => 'adults',
+            'description' => 'price for adults',
+            'cabinIds'    => [$cabin->id],
+            'voyageId'    => $voyage2->id,
+            'currency'    => 'EUR',
+            'priceMinor'  => 11000,
+            'companyId'   => $companyId
+        ];
+
+        $createPrice2Response = $this->postJson('/api/prices/create', $voyage2Price);
+        $createPrice2Response->assertStatus(200);
+
+        $this->assertDatabaseHas('voyage_prices', [
+            'title' => $voyage1Price['title'],
+            'title' => $voyage2Price['title']
+        ]);
+
+        $this->assertDatabaseHas('price_cabin_pivot', [
+            'id'      => 1,
+            'priceId' => 1,
+            'cabinId' => $cabin->id,
+
+            'id'      => 2,
+            'priceId' => 2,
+            'cabinId' => $cabin->id,
+        ]);
+
+        $this->assertDatabaseCount('voyage_prices', '2');
+        $this->assertDatabaseCount('price_cabin_pivot', '2');
+
+
+        $price1 = $createPrice1Response['data'];
+
+        $updatePrice1Request = [
+            'title'       => 'adults',
+            'description' => 'updated description',
+            'voyageId'    => $voyage1->id,
+            'companyId'   => $companyId
+        ];
+
+        $updatePrice1Response = $this->postJson('/api/prices/update/' . $price1['id'], $updatePrice1Request);
+
+        $updatePrice1Response->assertStatus(200)
+                             ->assertJsonStructure(['data'])
+                             ->assertJsonFragment(['title' => $updatePrice1Request['title']]);
+
+        $this->assertDatabasehas('voyage_prices', [
+            'title'       => $updatePrice1Request['title'],
+            'description' => $updatePrice1Request['description'],
+            'priceMinor'  => $price1['priceMinor']
+        ]);
+    }
 }
