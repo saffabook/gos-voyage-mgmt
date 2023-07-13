@@ -1114,7 +1114,7 @@ class VoyagePriceTest extends TestCase
 
         $updatePriceResponse->assertStatus(422)
                             ->assertJson([
-                                'error' => 'This voyage is active. Price can only be updated with forceAction. Would you like to add a promotional price?'
+                                'error' => 'This voyage is active. Please confirm you would like to change this. Would you like to add a promotional price?'
                             ]);
     }
 

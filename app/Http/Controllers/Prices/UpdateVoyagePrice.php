@@ -84,9 +84,9 @@ class UpdateVoyagePrice extends Controller
         if ($voyageIsActive && isset($validatedData['priceMinor']) && empty($validatedData['forceAction'])) {
 
             if (! isset($validatedData['discountedPriceMinor'])) {
-                return ApiResponse::error('This voyage is active. Price can only be updated with forceAction. Would you like to add a promotional price?');
+                return ApiResponse::error('This voyage is active. Please confirm you would like to change this. Would you like to add a promotional price?');
             }
-            return ApiResponse::error('This voyage is active. Price can only be updated with forceAction.');
+            return ApiResponse::error('This voyage is active. Please confirm you would like to change this.');
         }
 
         // If request contains updated title, check cabin price titles for duplicates.
