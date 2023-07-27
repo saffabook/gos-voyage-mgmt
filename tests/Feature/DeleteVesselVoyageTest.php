@@ -231,7 +231,6 @@ class DeleteVesselVoyageTest extends TestCase
         $createPriceRequest = [
             'title'       => 'adults',
             'description' => 'price for adults',
-            // 'cabinIds'    => [$cabin1->id, $cabin2->id, $cabin3->id],
             'cabinIds'    => [1, 2, 3],
             'voyageId'    => $voyage->id,
             'currency'    => 'EUR',

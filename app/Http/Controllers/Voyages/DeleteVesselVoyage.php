@@ -28,19 +28,15 @@ class DeleteVesselVoyage extends Controller
             return ApiResponse::error('Voyage not found');
         }
 
-        $voyageIsActive = $voyage->voyageStatus === 'ACTIVE'
-                       && $voyage->endDate >= Carbon::now();
+        $voyageIsActive = $voyage->voyageStatus === 'ACTIVE';
 
-        if ($voyageIsActive) {
+        if ($voyageIsActive && $voyage->endDate >= Carbon::now()) {
             return ApiResponse::error(
                 'Voyage is active. Convert status to draft or cancelled.'
             );
         }
 
-        $voyageIsExpired = $voyage->voyageStatus === 'ACTIVE'
-                        && $voyage->endDate < Carbon::now();
-
-        if ($voyageIsExpired) {
+        if ($voyageIsActive && $voyage->endDate < Carbon::now()) {
             return ApiResponse::error(
                 'This voyage has expired. It cannot be deleted.'
             );
