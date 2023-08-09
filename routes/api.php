@@ -86,6 +86,7 @@ Route::group([
     ], function () {
     Route::post('create', Controllers\Voyages\CreateVesselVoyage::class);
     Route::post('/get/{id}', Controllers\Voyages\GetVesselVoyage::class);
+    Route::post('update/{id}', Controllers\Voyages\UpdateVesselVoyage::class);
     Route::post('/delete/{id}', Controllers\Voyages\DeleteVesselVoyage::class);
 });
 
