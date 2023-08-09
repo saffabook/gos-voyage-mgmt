@@ -16,7 +16,7 @@ class CreateVesselVoyages extends Migration
         Schema::create('vessel_voyages', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('title')->unique();
+            $table->string('title');
             $table->longtext('description');
             $table->integer('vesselId');
             $table->enum('voyageType', ['ROUNDTRIP', 'ONEWAY', 'DAYTRIP']);
