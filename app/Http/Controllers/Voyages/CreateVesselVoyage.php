@@ -36,9 +36,9 @@ class CreateVesselVoyage extends Controller
         }
 
         // Check vessel availability.
-        $vesselIsBooked = CreateVesselVoyageService::isVesselBooked($validatedData);
+        $isVesselBooked = CreateVesselVoyageService::isVesselBooked($validatedData);
 
-        if ($vesselIsBooked) {
+        if ($isVesselBooked) {
             return ApiResponse::error(
                 'The requested vessel is already booked for this time.'
             );

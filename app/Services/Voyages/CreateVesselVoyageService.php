@@ -59,12 +59,12 @@ class CreateVesselVoyageService
 
     public static function isVesselBooked($validatedData)
     {
-        $vesselIsBooked = VesselVoyage::where('vesselId', $validatedData['vesselId'])
+        $isVesselBooked = VesselVoyage::where('vesselId', $validatedData['vesselId'])
             ->whereDate('startDate', '<=', $validatedData['endDate'])
             ->whereDate('endDate', '>=', $validatedData['startDate'])
             ->exists();
 
-        if ($vesselIsBooked) {
+        if ($isVesselBooked) {
             return true;
         }
     }
