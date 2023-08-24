@@ -2,69 +2,49 @@
 
 namespace App\Http\Controllers\Voyages;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use App\Models\VesselVoyage;
 use App\Helpers\ApiResponse;
-use App\Models\Vessel;
-use Illuminate\Validation\Rule;
 use App\Helpers\GenerateVoyageId;
+use App\Http\Controllers\Controller;
+use App\Models\VesselVoyage;
+use App\Services\Voyages\CreateVesselVoyageService;
+use Illuminate\Http\Request;
 
 class CreateVesselVoyage extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Create voyage primary data after checking the user/company is authorized
+     * to use the requested vessel and ports, and that voyage dates make sense
+     * chronologically and do not conflict with another voyage for the same vessel.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \App\Helpers\ApiResponse
      */
     public function __invoke(Request $request)
     {
+        // Validate request data.
+        $validatedData = CreateVesselVoyageService::validateData($request);
 
-        $validatedData = Validator::make($request->all(), [
-            'title'              => 'required|string|unique:vessel_voyages|max:255',
-            'description'        => 'string|between:30,600',
-            'vesselId'           => 'required|integer',
-            'voyageType'         => 'in:ROUNDTRIP,ONEWAY,DAYTRIP',
-            'isPassportRequired' => 'boolean',
-            'embarkPortId'       => 'required|integer|exists:voyage_ports,id',
-            'disembarkPortId'    => 'required|integer|exists:voyage_ports,id',
-            'startDate'          => 'required|date_format:Y-m-d',
-            'startTime'          => 'required|date_format:H:i',
-            'endDate'            => 'required|date_format:Y-m-d',
-            'endTime'            => 'required|date_format:H:i',
-        ], [
-            'title.unique'           => 'A voyage with that name already exists.',
-            'embarkPortId.exists'    => 'The embark port does not exist.',
-            'disembarkPortId.exists' => 'The disembark port does not exist.'
-        ]);
-
-        if ($validatedData->fails()) {
-            return ApiResponse::error($validatedData->messages());
+        if (isset($validatedData['error'])) {
+            return ApiResponse::error($validatedData['error']);
         }
 
-        $vessel = Vessel::where('companyId', $request->input('companyId'))
-                        ->find($request->input('vesselId'));
+        // Check ports exist.
+        $portsExist = CreateVesselVoyageService::checkPortsExist($validatedData);
 
-        if (!$vessel) {
-            return ApiResponse::error('Vessel does not exist');
+        if (! $portsExist) {
+            return ApiResponse::error('The requested ports are invalid.');
         }
 
-        $validatedData = $validatedData->validated();
+        // Check vessel availability.
+        $isVesselBooked = CreateVesselVoyageService::isVesselBooked($validatedData);
 
-        $validatedData['companyId'] = $request->input('companyId');
-
-        $vesselIsBooked = VesselVoyage::where(
-            'vesselId', $validatedData['vesselId']
-        )->whereDate('startDate', '<=', $validatedData['endDate'])
-         ->whereDate('endDate', '>=', $validatedData['startDate'])
-         ->exists();
-
-        if (!empty($vesselIsBooked)) {
-            return ApiResponse::error('The vessel is already booked for this time');
+        if ($isVesselBooked) {
+            return ApiResponse::error(
+                'The requested vessel is already booked for this time.'
+            );
         }
 
+        // Create voyage ref.
         $validatedData['voyageReferenceNumber'] = GenerateVoyageId::execute(
             $request->input('companyId')
         );
@@ -72,7 +52,7 @@ class CreateVesselVoyage extends Controller
         $voyage = VesselVoyage::create($validatedData);
 
         return ApiResponse::success(
-            $voyage->toArray(), 'The voyage was created'
+            $voyage->toArray(), 'The voyage was created.'
         );
     }
 }
