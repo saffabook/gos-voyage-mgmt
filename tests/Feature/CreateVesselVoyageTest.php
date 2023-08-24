@@ -178,10 +178,7 @@ class CreateVesselVoyageTest extends TestCase
 
         $jsonResponse = $this->postJson('/api/voyages/create', $request);
 
-        $jsonResponse->assertStatus(422)
-                     ->assertJson([
-                        'error' => 'The requested vessel is invalid.'
-                     ]);
+        $jsonResponse->assertStatus(422)->assertJsonStructure(['error' => ['vesselId']]);
 
         $this->assertDatabaseMissing('vessel_voyages', $request);
     }
@@ -216,10 +213,9 @@ class CreateVesselVoyageTest extends TestCase
 
         $jsonResponse = $this->postJson('/api/voyages/create', $request);
 
-        $jsonResponse->assertStatus(422)
-                     ->assertJson([
-                        'error' => 'The requested embarkPortId is invalid.'
-                     ]);
+        $jsonResponse->assertStatus(422)->assertJson([
+            'error' => 'The requested ports are invalid.'
+        ]);
 
         $this->assertDatabaseMissing('vessel_voyages', $request);
     }
@@ -254,132 +250,11 @@ class CreateVesselVoyageTest extends TestCase
 
         $jsonResponse = $this->postJson('/api/voyages/create', $request);
 
-        $jsonResponse->assertStatus(422)
-                     ->assertJson([
-                        'error' => 'The requested disembarkPortId is invalid.'
-                     ]);
+        $jsonResponse->assertStatus(422)->assertJson([
+            'error' => 'The requested ports are invalid.'
+        ]);
 
         $this->assertDatabaseMissing('vessel_voyages', $request);
-    }
-
-
-    /**
-     * Ensure user receives a warning if creating a voyage title to
-     * be identical to an existing voyage title for the same company.
-     *
-     * @return void
-     */
-    public function testUserWarnedIfCreatingVoyageWithExistingTitle()
-    {
-        $companyId     = 1;
-        $vessel        = Vessel::factory()->create(['companyId' => $companyId]);
-        $embarkPort    = VoyagePort::factory()->create(['companyId' => $companyId]);
-        $disembarkPort = VoyagePort::factory()->create(['companyId' => $companyId]);
-
-        $voyageInDb = VesselVoyage::create([
-            'title'                 => 'Test Voyage',
-            'description'           => 'This is the description for $voyageInDb database check.',
-            'vesselId'              => $vessel->id,
-            'voyageType'            => 'ROUNDTRIP',
-            'embarkPortId'          => $embarkPort->id,
-            'startDate'             => Carbon::now()->addDays(12)->toDateString(),
-            'startTime'             => '11:50',
-            'disembarkPortId'       => $disembarkPort->id,
-            'endDate'               => Carbon::now()->addDays(22)->toDateString(),
-            'endTime'               => '16:30',
-            'companyId'             => $companyId,
-            'voyageReferenceNumber' => GenerateVoyageId::execute($companyId)
-        ]);
-
-        $request = [
-            'title'           => 'tEsT vOyAge',
-            'description'     => 'This is the description for $request database check.',
-            'vesselId'        => $vessel->id,
-            'voyageType'      => 'ROUNDTRIP',
-            'embarkPortId'    => $embarkPort->id,
-            'startDate'       => Carbon::now()->addDays(32)->toDateString(),
-            'startTime'       => '11:50',
-            'disembarkPortId' => $disembarkPort->id,
-            'endDate'         => Carbon::now()->addDays(42)->toDateString(),
-            'endTime'         => '16:30',
-            'companyId'       => $companyId
-        ];
-
-        $jsonResponse = $this->postJson('/api/voyages/create', $request);
-
-        $jsonResponse->assertStatus(422)
-                     ->assertJson([
-                        'error' => 'You have already created a voyage with that title. Please confirm you would like to create this voyage with the duplicate title.'
-                     ]);
-
-        $this->assertDatabaseHas('vessel_voyages', [
-            'description' => $voyageInDb['description']
-        ]);
-
-        $this->assertDatabaseMissing('vessel_voyages', [
-            'description' => $request['description']
-        ]);
-    }
-
-
-    /**
-     * Ensure user can create a voyage title to duplicate an existing voyage
-     * title for the same company if sending a `forceAction` with the request.
-     *
-     * @return void
-     */
-    public function testUserCanCreateVoyageToUseExistingTitleWithForceAction()
-    {
-        $companyId     = 1;
-        $vessel        = Vessel::factory()->create(['companyId' => $companyId]);
-        $embarkPort    = VoyagePort::factory()->create(['companyId' => $companyId]);
-        $disembarkPort = VoyagePort::factory()->create(['companyId' => $companyId]);
-
-        $voyageInDb = VesselVoyage::create([
-            'title'                 => 'Test Voyage',
-            'description'           => 'This is the description for $voyageInDb database check.',
-            'vesselId'              => $vessel->id,
-            'voyageType'            => 'ROUNDTRIP',
-            'embarkPortId'          => $embarkPort->id,
-            'startDate'             => Carbon::now()->addDays(12)->toDateString(),
-            'startTime'             => '11:50',
-            'disembarkPortId'       => $disembarkPort->id,
-            'endDate'               => Carbon::now()->addDays(22)->toDateString(),
-            'endTime'               => '16:30',
-            'companyId'             => $companyId,
-            'voyageReferenceNumber' => GenerateVoyageId::execute($companyId)
-        ]);
-
-        $request = [
-            'title'           => 'tEsT vOyAge',
-            'description'     => 'This is the description for $request database check.',
-            'vesselId'        => $vessel->id,
-            'voyageType'      => 'ROUNDTRIP',
-            'embarkPortId'    => $embarkPort->id,
-            'startDate'       => Carbon::now()->addDays(32)->toDateString(),
-            'startTime'       => '11:50',
-            'disembarkPortId' => $disembarkPort->id,
-            'endDate'         => Carbon::now()->addDays(42)->toDateString(),
-            'endTime'         => '16:30',
-            'companyId'       => $companyId,
-            'forceAction'     => 1
-        ];
-
-        $jsonResponse = $this->postJson('/api/voyages/create', $request);
-
-        $jsonResponse->assertStatus(200)
-                     ->assertJsonStructure(['data'])
-                     ->assertJsonFragment(['title'       => $request['title']])
-                     ->assertJsonFragment(['description' => $request['description']])
-                     ->assertJsonFragment(['message'     => 'The voyage was created.']);
-
-        $this->assertDatabaseHas('vessel_voyages', [
-            'description' => $voyageInDb['description']
-        ]);
-
-        $this->assertDatabaseHas('vessel_voyages', [
-            'description' => $request['description']
-        ]);
     }
 
 
@@ -411,11 +286,128 @@ class CreateVesselVoyageTest extends TestCase
 
         $jsonResponse = $this->postJson('/api/voyages/create', $request);
 
-        $jsonResponse->assertStatus(422)
-                     ->assertJson([
-                        'error' => 'The voyage start date cannot be set later than the voyage end date.'
-                     ]);
+        $jsonResponse->assertStatus(422)->assertJsonStructure(['error' => ['startDate']]);
 
         $this->assertDatabaseCount('vessel_voyages', 0);
+    }
+
+
+    /**
+     * Ensure user cannot create a voyage for dates when the requested vessel is
+     * already booked for another voyage.
+     *
+     * @return void
+     */
+    public function testUserCannotCreateVoyageWhenVesselIsBookedForAnotherVoyage()
+    {
+        $companyId     = 1;
+        $vessel        = Vessel::factory()->create(['companyId' => $companyId]);
+        $embarkPort    = VoyagePort::factory()->create(['companyId' => $companyId]);
+        $disembarkPort = VoyagePort::factory()->create(['companyId' => $companyId]);
+
+        $voyageInDb = VesselVoyage::create([
+            'title'                 => 'Test Voyage',
+            'description'           => 'This is the description for $voyageInDb database check.',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $embarkPort->id,
+            'startDate'             => Carbon::now()->addDays(12)->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $disembarkPort->id,
+            'endDate'               => Carbon::now()->addDays(22)->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $companyId,
+            'voyageReferenceNumber' => GenerateVoyageId::execute($companyId)
+        ]);
+
+        $request = [
+            'title'           => 'Overlap Voyage',
+            'description'     => 'This is the description for $request database check.',
+            'vesselId'        => $vessel->id,
+            'voyageType'      => 'ROUNDTRIP',
+            'embarkPortId'    => $embarkPort->id,
+            'startDate'       => Carbon::now()->addDays(20)->toDateString(),
+            'startTime'       => '11:50',
+            'disembarkPortId' => $disembarkPort->id,
+            'endDate'         => Carbon::now()->addDays(42)->toDateString(),
+            'endTime'         => '16:30',
+            'companyId'       => $companyId
+        ];
+
+        $jsonResponse = $this->postJson('/api/voyages/create', $request);
+
+        $jsonResponse->assertStatus(422)->assertJson([
+            'error' => 'The requested vessel is already booked for this time.'
+            ]);
+
+        $this->assertDatabaseHas('vessel_voyages', [
+            'description' => $voyageInDb['description']
+        ]);
+
+        $this->assertDatabaseMissing('vessel_voyages', [
+            'description' => $request['description']
+        ]);
+    }
+
+
+    /**
+     * Ensure user can create a voyage successfully for dates when the
+     * requested vessel is not booked for another voyage.
+     *
+     * @return void
+     */
+    public function testUserCanCreateVoyageWhenVesselIsNotBookedForAnotherVoyage()
+    {
+        $companyId     = 1;
+        $vessel        = Vessel::factory()->create(['companyId' => $companyId]);
+        $embarkPort    = VoyagePort::factory()->create(['companyId' => $companyId]);
+        $disembarkPort = VoyagePort::factory()->create(['companyId' => $companyId]);
+
+        $voyageInDb = VesselVoyage::create([
+            'title'                 => 'Test Voyage',
+            'description'           => 'This is the description for $voyageInDb database check.',
+            'vesselId'              => $vessel->id,
+            'voyageType'            => 'ROUNDTRIP',
+            'embarkPortId'          => $embarkPort->id,
+            'startDate'             => Carbon::now()->addDays(12)->toDateString(),
+            'startTime'             => '11:50',
+            'disembarkPortId'       => $disembarkPort->id,
+            'endDate'               => Carbon::now()->addDays(22)->toDateString(),
+            'endTime'               => '16:30',
+            'companyId'             => $companyId,
+            'voyageReferenceNumber' => GenerateVoyageId::execute($companyId)
+        ]);
+
+        $request = [
+            'title'           => 'Overlap Voyage',
+            'description'     => 'This is the description for $request database check.',
+            'vesselId'        => $vessel->id,
+            'voyageType'      => 'ROUNDTRIP',
+            'embarkPortId'    => $embarkPort->id,
+            'startDate'       => Carbon::now()->addDays(23)->toDateString(),
+            'startTime'       => '11:50',
+            'disembarkPortId' => $disembarkPort->id,
+            'endDate'         => Carbon::now()->addDays(42)->toDateString(),
+            'endTime'         => '16:30',
+            'companyId'       => $companyId
+        ];
+
+        $jsonResponse = $this->postJson('/api/voyages/create', $request);
+
+        $jsonResponse->assertStatus(200)
+            ->assertJsonStructure(['data'])
+            ->assertJsonFragment(['title'       => $request['title']])
+            ->assertJsonFragment(['description' => $request['description']])
+            ->assertJsonFragment(['message'     => 'The voyage was created.']);
+
+        $this->assertDatabaseHas('vessel_voyages', [
+            'title'       => $voyageInDb['title'],
+            'description' => $voyageInDb['description']
+        ]);
+
+        $this->assertDatabaseHas('vessel_voyages', [
+            'title'       => $request['title'],
+            'description' => $request['description']
+        ]);
     }
 }
