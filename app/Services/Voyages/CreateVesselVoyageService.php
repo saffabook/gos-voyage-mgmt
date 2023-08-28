@@ -18,7 +18,7 @@ class CreateVesselVoyageService
             'isPassportRequired' => 'boolean',
             'embarkPortId'       => 'required|integer',
             'disembarkPortId'    => 'required|integer',
-            'startDate'          => 'required|date_format:Y-m-d|before:endDate',
+            'startDate'          => 'required|date_format:Y-m-d|before_or_equal:endDate',
             'startTime'          => 'required|date_format:H:i',
             'endDate'            => 'required|date_format:Y-m-d',
             'endTime'            => 'required|date_format:H:i',

@@ -410,4 +410,38 @@ class CreateVesselVoyageTest extends TestCase
             'description' => $request['description']
         ]);
     }
+
+
+    /**
+     * Ensure user can create voyage where start date and end date are the same.
+     *
+     * @return void
+     */
+    public function testUserCanCreateVoyageWithSameStartDateAndEndDate()
+    {
+        $companyId     = 1;
+        $vessel        = Vessel::factory()->create(['companyId' => $companyId]);
+        $embarkPort    = VoyagePort::factory()->create(['companyId' => $companyId]);
+        $disembarkPort = VoyagePort::factory()->create(['companyId' => $companyId]);
+
+        $request = [
+            'title'           => 'Single Day Voyage',
+            'description'     => 'Description for Single Day Voyage.',
+            'vesselId'        => $vessel->id,
+            'voyageType'      => 'DAYTRIP',
+            'embarkPortId'    => $embarkPort->id,
+            'startDate'       => Carbon::now()->addDay(42)->toDateString(),
+            'startTime'       => '11:50',
+            'disembarkPortId' => $disembarkPort->id,
+            'endDate'         => Carbon::now()->addDays(42)->toDateString(),
+            'endTime'         => '16:30',
+            'companyId'       => $companyId
+        ];
+
+        $response = $this->postJson('/api/voyages/create', $request);
+
+        $response->assertStatus(200);
+        $response->assertJson(['data' => $request]);
+        $this->assertDatabaseHas('vessel_voyages', $request);
+    }
 }
